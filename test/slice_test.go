@@ -8,6 +8,8 @@ package test
 import (
 	"github.com/xfali/stream"
 	"reflect"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -122,6 +124,35 @@ func TestSliceDistinct(t *testing.T) {
 
 	s.Distinct(func(a, b int) int {
 		return a - b
+	}).Foreach(func(i int) {
+		t.Log(i)
+	})
+}
+
+func TestSliceMap(t *testing.T) {
+	s := stream.Slice([]string{"1", "2", "3"})
+	s.Map(func(s string) int {
+		i, _ := strconv.Atoi(s)
+		return i
+	}).Foreach(func(i int) {
+		t.Log(i)
+	})
+}
+
+func TestSliceFlatMap(t *testing.T) {
+	s := stream.Slice([]string{"hello world", "xfali stream"})
+	s.FlatMap(func(s string) []string {
+		return strings.Split(s, " ")
+	}).Foreach(func(i string) {
+		t.Log(i)
+	})
+
+	s = stream.Slice([]string{"1,2,3,4", "5,6,7,8"})
+	s.FlatMap(func(s string) []int {
+		return stream.Slice(strings.Split(s, ",")).Map(func(s string) int {
+			i, _ := strconv.Atoi(s)
+			return i
+		}).Collect().([]int)
 	}).Foreach(func(i int) {
 		t.Log(i)
 	})

@@ -133,7 +133,17 @@ func (s *SliceStream) AllMatch(fn interface{}) bool {
 }
 
 func (s *SliceStream) Map(fn interface{}) Stream {
-	ret, err := functools.Apply(fn, s.slice)
+	ret, err := Map(fn, s.slice)
+	if err != nil {
+		panic(err)
+	}
+	return &SliceStream{
+		slice: ret,
+	}
+}
+
+func (s *SliceStream) FlatMap(fn interface{}) Stream {
+	ret, err := flatMap(fn, s.slice)
 	if err != nil {
 		panic(err)
 	}

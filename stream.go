@@ -33,7 +33,7 @@ type Stream interface {
     Distinct(fn interface{}) Stream
 
     //映射并扁平化为一个stream
-    //FlatMap(fn interface{}) Stream
+    FlatMap(fn interface{}) Stream
 
     //由一个类型映射到另一个类型
     //参数类型为：fn func(OLD_TYPE) NEW_TYPE
