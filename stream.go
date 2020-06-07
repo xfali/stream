@@ -10,6 +10,8 @@ type Stream interface {
 
     FindFirst() *Option
 
+    FindLast() *Option
+
     FindAny() *Option
 
     //fn func(TYPE) bool

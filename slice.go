@@ -50,6 +50,16 @@ func (s *SliceStream) FindFirst() *Option {
     return CanNil(first.Interface())
 }
 
+func (s *SliceStream)FindLast() *Option {
+    v := reflect.ValueOf(s.slice)
+    if v.IsNil() || v.Len() == 0 {
+        return None
+    }
+
+    last := v.Index(v.Len()-1)
+    return CanNil(last.Interface())
+}
+
 func (s *SliceStream) FindAny() *Option {
     v := reflect.ValueOf(s.slice)
     if v.IsNil() || v.Len() == 0 {
