@@ -110,3 +110,19 @@ func TestSliceLimitSkip(t *testing.T) {
 		}
 	})
 }
+
+func TestSliceDistinct(t *testing.T) {
+	s := stream.Slice([]int{1, 2, 2, 4, 5})
+	x := s.Distinct(func(a, b int) int {
+		return a - b
+	}).Collect().([]int)
+	if x[2] == 2 {
+		t.Fatal("cannot be 2")
+	}
+
+	s.Distinct(func(a, b int) int {
+		return a - b
+	}).Foreach(func(i int) {
+		t.Log(i)
+	})
+}

@@ -29,7 +29,8 @@ type Stream interface {
     Skip(size int) Stream
 
     //返回一个去重的stream
-    //Distinct() Stream
+    //参数类型为：fn func(t1, t2 TYPE) int
+    Distinct(fn interface{}) Stream
 
     //映射并扁平化为一个stream
     //FlatMap(fn interface{}) Stream

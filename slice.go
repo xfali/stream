@@ -60,6 +60,16 @@ func (s *SliceStream) Skip(size int) Stream {
 	}
 }
 
+func (s *SliceStream) Distinct(fn interface{}) Stream {
+	ret, err := Distinct(fn, s.slice)
+	if err != nil {
+		panic(err)
+	}
+	return &SliceStream{
+		slice: ret,
+	}
+}
+
 func (s *SliceStream) FindFirst() *Option {
 	v := reflect.ValueOf(s.slice)
 	if v.IsNil() || v.Len() == 0 {
