@@ -22,11 +22,7 @@ func limit(size int, slice interface{}) (interface{}, error) {
 	if size >= in.Len() {
 		return slice, nil
 	}
-	out := reflect.MakeSlice(in.Type(), 0, size)
-	for i := 0; i < size; i++ {
-		out = reflect.Append(out, in.Index(i))
-	}
-	return out.Interface(), nil
+	return in.Slice(0, size).Interface(), nil
 }
 
 func Skip(size int, slice interface{}) (ret interface{}, err error) {
@@ -44,10 +40,5 @@ func skip(size int, slice interface{}) (interface{}, error) {
 	if size > in.Len() {
 		size = in.Len()
 	}
-	outSize := in.Len() - size
-	out := reflect.MakeSlice(in.Type(), 0, outSize)
-	for i := size; i < in.Len(); i++ {
-		out = reflect.Append(out, in.Index(i))
-	}
-	return out.Interface(), nil
+	return in.Slice(size, in.Len()).Interface(), nil
 }
