@@ -28,6 +28,12 @@ type Stream interface {
     //返回一个扔掉了前n个元素的流
     Skip(size int) Stream
 
+    //返回一个去重的stream
+    //Distinct() Stream
+
+    //映射并扁平化为一个stream
+    //FlatMap(fn interface{}) Stream
+
     //由一个类型映射到另一个类型
     //参数类型为：fn func(OLD_TYPE) NEW_TYPE
     Map(fn interface{}) Stream

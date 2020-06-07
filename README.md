@@ -39,6 +39,10 @@ s.Filter(func(i int) bool {
 
 ## 未完成项
 * 持续丰富stream API
+|  方法   | 
+|  :----  | 
+| Distinct |
+| FlatMap |
 * 提高性能
 * 并行处理
 
