@@ -9,6 +9,8 @@ stream是一个数据处理工具，支持方法如下：
 | Filter  | 过滤元素，返回一个包括所有符合过滤条件的元素的流 |
 | Limit  | 返回一个不超过给定长度的流 |
 | Skip  | 返回一个扔掉了前n个元素的流 |
+| Distinct  | 返回一个去重的stream |
+| FlatMap  | 映射并扁平化为一个stream |
 | Map  | 由一个类型映射到另一个类型 |
 | Foreach  | 迭代流中所有数据 |
 | AnyMatch  | 任意匹配一个则返回true，否则返回false |
@@ -39,10 +41,6 @@ s.Filter(func(i int) bool {
 
 ## 未完成项
 * 持续丰富stream API
-|  方法   | 
-|  :----  | 
-| Distinct |
-| FlatMap |
 * 提高性能
 * 并行处理
 
