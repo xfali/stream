@@ -22,7 +22,7 @@ func distinct(function, slice interface{}) (interface{}, error) {
 	}
 	inType := in.Type().Elem()
 	if !verifyCompareFunction(fn, inType) {
-		panic("distinct: Function must be of type func(" + inType.String() + ","+ inType.String() + ") int")
+		panic("distinct: Function must be of type func(" + inType.String() + "," + inType.String() + ") int")
 	}
 
 	out := reflect.MakeSlice(in.Type(), 0, in.Len())
@@ -33,7 +33,7 @@ func distinct(function, slice interface{}) (interface{}, error) {
 		for j := 0; j < out.Len(); j++ {
 			param[0] = in.Index(i)
 			param[1] = out.Index(j)
-			if fn.Call(param[:])[0].Int() == 0{
+			if fn.Call(param[:])[0].Int() == 0 {
 				found = true
 			}
 		}

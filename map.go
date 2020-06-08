@@ -20,7 +20,7 @@ func Map(function, slice interface{}) (ret interface{}, err error) {
 	inType := in.Type().Elem()
 	ok, outType := verifyMapFuncType(fn, inType)
 	if !ok {
-		return nil, errors.New("map: Function must be of type func("+inType.String()+") outputElemType")
+		return nil, errors.New("map: Function must be of type func(" + inType.String() + ") outputElemType")
 	}
 	var param [1]reflect.Value
 	out := reflect.MakeSlice(reflect.SliceOf(outType), 0, in.Len())
