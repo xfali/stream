@@ -70,6 +70,16 @@ func (s *SliceStream) Distinct(fn interface{}) Stream {
 	}
 }
 
+func (s *SliceStream) Sort(fn interface{}) Stream {
+	ret, err := Sort(fn, s.slice)
+	if err != nil {
+		panic(err)
+	}
+	return &SliceStream{
+		slice: ret,
+	}
+}
+
 func (s *SliceStream) FindFirst() *Option {
 	v := reflect.ValueOf(s.slice)
 	if v.IsNil() || v.Len() == 0 {

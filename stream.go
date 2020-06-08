@@ -18,19 +18,23 @@ type Stream interface {
     //获得一个随机元素
     FindAny() *Option
 
-    //过滤元素，返回一个包括所有符合过滤条件的元素的流
+    //过滤元素，返回一个包括所有符合过滤条件的元素的stream
     //参数类型为：fn func(TYPE) bool
     Filter(fn interface{}) Stream
 
-    //返回一个不超过给定长度的流
+    //返回一个不超过给定长度的stream
     Limit(size int) Stream
 
-    //返回一个扔掉了前n个元素的流
+    //返回一个扔掉了前n个元素的stream
     Skip(size int) Stream
 
     //返回一个去重的stream
     //参数类型为：fn func(t1, t2 TYPE) int
     Distinct(fn interface{}) Stream
+
+    //返回一个排序后的stream
+    //参数类型为：fn func(t1, t2 TYPE) int
+    Sort(fn interface{}) Stream
 
     //映射并扁平化为一个stream
     FlatMap(fn interface{}) Stream

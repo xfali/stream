@@ -10,6 +10,7 @@ stream是一个数据处理工具，支持方法如下：
 | Limit  | 返回一个不超过给定长度的流 |
 | Skip  | 返回一个扔掉了前n个元素的流 |
 | Distinct  | 返回一个去重的stream |
+| Sort  | 返回一个排序后的stream |
 | FlatMap  | 映射并扁平化为一个stream |
 | Map  | 由一个类型映射到另一个类型 |
 | Foreach  | 迭代流中所有数据 |
