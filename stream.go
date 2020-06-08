@@ -57,7 +57,7 @@ type Stream interface {
 
     //对stream中元素进行聚合求值
     //参数类型为：fn func(out, in TYPE) interface{}
-    Reduce(fn interface{}) interface{}
+    Reduce(fn, initValue interface{}) interface{}
 
     //获得slice
     Collect() interface{}

@@ -162,12 +162,20 @@ func (s *SliceStream) FlatMap(fn interface{}) Stream {
 	}
 }
 
-func (s *SliceStream) Reduce(fn interface{}) interface{} {
-	ret, err := Reduce(fn, s.slice)
-	if err != nil {
-		panic(err)
+func (s *SliceStream) Reduce(fn, initValue interface{}) interface{} {
+	if initValue != nil {
+		ret, err := functools.Reduce(fn, s.slice, initValue)
+		if err != nil {
+			panic(err)
+		}
+		return ret
+	} else {
+		ret, err := Reduce(fn, s.slice)
+		if err != nil {
+			panic(err)
+		}
+		return ret
 	}
-	return ret
 }
 
 func (s *SliceStream) Collect() interface{} {
