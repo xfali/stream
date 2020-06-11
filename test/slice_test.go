@@ -21,6 +21,14 @@ func TestSliceFirst(t *testing.T) {
 	}
 }
 
+func TestSliceLast(t *testing.T) {
+	s := stream.Slice([]int{1, 2, 3, 4, 5})
+	o := s.FindLast()
+	if !reflect.DeepEqual(5, o.Get()) {
+		t.Fatalf("Stream.First() failed: expected %v got %v", 1, o.Get())
+	}
+}
+
 func TestSliceFindAny(t *testing.T) {
 	s := stream.Slice([]int{1, 2, 3, 4, 5})
 	for i := 0; i < 10; i++ {
@@ -217,4 +225,31 @@ func TestSliceReduce(t *testing.T) {
 			t.Fatal("expect 15 but get: ", ret)
 		}
 	})
+}
+
+type student struct {
+	name   string
+	gender string
+}
+
+func TestSliceGroup(t *testing.T) {
+	s := []student{
+		{"lilei", "boy"},
+		{"hanmeimei", "girl"},
+		{"lily", "girl"},
+		{"jim", "boy"},
+		{"tom", "boy"},
+	}
+
+	ret, err := stream.Group(func(s student) (string, student) {
+		return s.gender, s
+	}, s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for k, v := range ret.(map[string][]student) {
+		for _, stu := range v {
+			t.Log(k, stu)
+		}
+	}
 }
