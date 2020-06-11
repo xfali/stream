@@ -59,3 +59,105 @@ func TestPipeFindAny(t *testing.T) {
 		}
 	}
 }
+
+func TestPipeLimit(t *testing.T) {
+	s := stream.Pipeline([]int{1, 2, 3, 4, 5})
+	s.Limit(2).Foreach(func(i int) {
+		t.Log(i)
+		if i == 3 {
+			t.Fatal("Limit cannot be 3 but got it")
+		}
+	})
+	s.Limit(0).Foreach(func(i int) {
+		switch i {
+		case 1, 2, 3, 4, 5:
+			t.Fatal("cannot be here")
+		default:
+			t.Log(i)
+		}
+	})
+
+	s.Limit(5).Foreach(func(i int) {
+		switch i {
+		case 1, 2, 3, 4, 5:
+			t.Log(i)
+		default:
+			t.Fatal("cannot be here")
+		}
+	})
+}
+
+func TestPipeSkip(t *testing.T) {
+	s := stream.Pipeline([]int{1, 2, 3, 4, 5})
+	s.Skip(2).Foreach(func(i int) {
+		t.Log(i)
+		if i == 1 || i == 2 {
+			t.Fatal("Skip 1、2 but got it")
+		}
+	})
+	s.Skip(0).Foreach(func(i int) {
+		switch i {
+		case 1, 2, 3, 4, 5:
+			t.Log(i)
+		default:
+			t.Fatal("cannot be here")
+		}
+	})
+
+	s.Skip(5).Foreach(func(i int) {
+		switch i {
+		case 1, 2, 3, 4, 5:
+			t.Fatal("cannot be here")
+		default:
+			t.Log(i)
+		}
+	})
+}
+
+func TestPipeLimitSkip(t *testing.T) {
+	s := stream.Pipeline([]int{1, 2, 3, 4, 5})
+	s.Skip(2).Limit(1).Foreach(func(i int) {
+		t.Log(i)
+		if i != 3 {
+			t.Fatal("Skip 1、2 but got it")
+		}
+	})
+}
+
+func TestPipeDistinct(t *testing.T) {
+	s := stream.Pipeline([]int{1, 2, 2, 4, 5})
+	s.Distinct(func(a, b int) int {
+		return a - b
+	}).Foreach(func(i int) {
+		t.Log(i)
+	})
+}
+
+func TestPipeSort(t *testing.T) {
+	t.Run("asc", func(t *testing.T) {
+		s := stream.Pipeline([]int{5, 2, 3, 1, 4})
+		s.Sort(func(a, b int) int {
+			return a - b
+		}).Foreach(func(i int) {
+			t.Log(i)
+		})
+	})
+
+	t.Run("desc", func(t *testing.T) {
+		s := stream.Pipeline([]int{5, 2, 3, 1, 4})
+		s.Sort(func(a, b int) int {
+			return b - a
+		}).Foreach(func(i int) {
+			t.Log(i)
+		})
+	})
+
+	t.Run("asc repeat", func(t *testing.T) {
+		s := stream.Pipeline([]int{5, 2, 5, 2, 3, 1, 4})
+		s.Sort(func(a, b int) int {
+			return a - b
+		}).Foreach(func(i int) {
+			t.Log(i)
+		})
+	})
+}

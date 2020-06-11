@@ -19,8 +19,8 @@ func (valve *FilterValve) Begin(count int) error {
 	return valve.next.Begin(-1)
 }
 
-func (opt *FilterValve) End() error {
-	return opt.next.End()
+func (valve *FilterValve) End() error {
+	return valve.next.End()
 }
 
 func (valve *FilterValve) Accept(v reflect.Value) error {

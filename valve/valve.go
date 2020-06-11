@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	DISTINCTED = 1
-	SORTED     = 1 << 1
+	NORMAL   = 0
+	DISTINCT = 1
+	SORTED   = 1 << 1
 )
 
 type FuncValve interface {
@@ -48,6 +49,7 @@ func (valve *BaseValve) Init(fn interface{}) error {
 
 func (valve *BaseValve) Next(v FuncValve) {
 	valve.next = v
+	v.SetState(valve.state)
 }
 func (valve *BaseValve) SetState(state int) {
 	valve.state = state

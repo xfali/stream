@@ -1,9 +1,9 @@
 package test
 
 import (
-    "github.com/xfali/stream"
-    "reflect"
-    "testing"
+	"github.com/xfali/stream/funcutil"
+	"reflect"
+	"testing"
 )
 
 func TestReduce(t *testing.T) {
@@ -12,7 +12,7 @@ func TestReduce(t *testing.T) {
         return a + b
     }
     expect := 6
-    out, err := stream.Reduce(add, in)
+    out, err := funcutil.Reduce(add, in)
     if err != nil {
         t.Fatalf("Reduce() failed: %v", err)
     }

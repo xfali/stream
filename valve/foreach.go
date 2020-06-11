@@ -19,7 +19,7 @@ func (valve *ForeachValve) Begin(count int) error {
 	return nil
 }
 
-func (opt *ForeachValve) End() error {
+func (valve *ForeachValve) End() error {
 	return nil
 }
 

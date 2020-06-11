@@ -3,7 +3,7 @@
 // @version V1.0
 // Description: 
 
-package stream
+package funcutil
 
 import (
 	"errors"
@@ -26,32 +26,32 @@ func sort(function, slice interface{}) (interface{}, error) {
 		panic("sort: Function must be of type func(" + inType.String() + "," + inType.String() + ") int")
 	}
 
-	ss := sortSlice{
-		v:       in,
-		compare: fn,
-		swap:    reflect.Swapper(slice),
+	ss := SortSlice{
+		V:       in,
+		Compare: fn,
+		SwapFunc:    reflect.Swapper(slice),
 	}
 	sort2.Sort(&ss)
-	return ss.v.Interface(), nil
+	return ss.V.Interface(), nil
 }
 
-type sortSlice struct {
-	v       reflect.Value
-	compare reflect.Value
-	swap    func(i, j int)
+type SortSlice struct {
+	V        reflect.Value
+	Compare  reflect.Value
+	SwapFunc func(i, j int)
 }
 
-func (p *sortSlice) Len() int {
-	return p.v.Len()
+func (p *SortSlice) Len() int {
+	return p.V.Len()
 }
 
-func (p *sortSlice) Less(i, j int) bool {
+func (p *SortSlice) Less(i, j int) bool {
 	var param [2]reflect.Value
-	param[0] = p.v.Index(i)
-	param[1] = p.v.Index(j)
-	return p.compare.Call(param[:])[0].Int() < 0
+	param[0] = p.V.Index(i)
+	param[1] = p.V.Index(j)
+	return p.Compare.Call(param[:])[0].Int() < 0
 }
 
-func (p *sortSlice) Swap(i, j int) {
-	p.swap(i, j)
+func (p *SortSlice) Swap(i, j int) {
+	p.SwapFunc(i, j)
 }

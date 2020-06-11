@@ -3,14 +3,14 @@
 // @version V1.0
 // Description: 
 
-package stream
+package funcutil
 
 import (
 	"errors"
 	"reflect"
 )
 
-func flatMap(function, slice interface{}) (interface{}, error) {
+func FlatMap(function, slice interface{}) (interface{}, error) {
 	in := reflect.ValueOf(slice)
 	fn := reflect.ValueOf(function)
 	if in.Kind() != reflect.Slice {

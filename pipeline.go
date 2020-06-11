@@ -7,6 +7,7 @@ package stream
 
 import (
 	"github.com/choleraehyq/gofunctools/functools"
+	"github.com/xfali/stream/funcutil"
 	"github.com/xfali/stream/valve"
 	"reflect"
 )
@@ -22,6 +23,7 @@ func Pipeline(slice interface{}) *PipeStream {
 		return nil
 	}
 	n := &valve.NoneValve{}
+	n.SetState(valve.NORMAL)
 	return &PipeStream{
 		slice: slice,
 		head:  n,
@@ -43,43 +45,37 @@ func (s *PipeStream) Filter(fn interface{}) Stream {
 }
 
 func (s *PipeStream) Limit(size int) Stream {
-	ret, err := Limit(size, s.slice)
-	if err != nil {
-		panic(err)
+	valve := &valve.LimitValve{
+		Limit: size,
 	}
-	return &PipeStream{
-		slice: ret,
-	}
+	s.v.Next(valve)
+	s.v = valve
+	return s
 }
 
 func (s *PipeStream) Skip(size int) Stream {
-	ret, err := Skip(size, s.slice)
-	if err != nil {
-		panic(err)
+	valve := &valve.SkipValve{
+		Skip: size,
 	}
-	return &PipeStream{
-		slice: ret,
-	}
+	s.v.Next(valve)
+	s.v = valve
+	return s
 }
 
 func (s *PipeStream) Distinct(fn interface{}) Stream {
-	ret, err := Distinct(fn, s.slice)
-	if err != nil {
-		panic(err)
-	}
-	return &PipeStream{
-		slice: ret,
-	}
+	valve := &valve.DistinctValve{}
+	valve.Init(fn)
+	s.v.Next(valve)
+	s.v = valve
+	return s
 }
 
 func (s *PipeStream) Sort(fn interface{}) Stream {
-	ret, err := Sort(fn, s.slice)
-	if err != nil {
-		panic(err)
-	}
-	return &PipeStream{
-		slice: ret,
-	}
+	valve := &valve.SortValve{}
+	valve.Init(fn)
+	s.v.Next(valve)
+	s.v = valve
+	return s
 }
 
 func (s *PipeStream) FindFirst() *Option {
@@ -135,7 +131,7 @@ func (s *PipeStream) AllMatch(fn interface{}) bool {
 }
 
 func (s *PipeStream) Map(fn interface{}) Stream {
-	ret, err := Map(fn, s.slice)
+	ret, err := funcutil.Map(fn, s.slice)
 	if err != nil {
 		panic(err)
 	}
@@ -145,7 +141,7 @@ func (s *PipeStream) Map(fn interface{}) Stream {
 }
 
 func (s *PipeStream) FlatMap(fn interface{}) Stream {
-	ret, err := flatMap(fn, s.slice)
+	ret, err := funcutil.FlatMap(fn, s.slice)
 	if err != nil {
 		panic(err)
 	}
@@ -162,7 +158,7 @@ func (s *PipeStream) Reduce(fn, initValue interface{}) interface{} {
 		}
 		return ret
 	} else {
-		ret, err := Reduce(fn, s.slice)
+		ret, err := funcutil.Reduce(fn, s.slice)
 		if err != nil {
 			panic(err)
 		}

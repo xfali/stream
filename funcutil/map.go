@@ -3,7 +3,7 @@
 // @version V1.0
 // Description: 
 
-package stream
+package funcutil
 
 import (
 	"errors"

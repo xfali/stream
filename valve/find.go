@@ -10,12 +10,6 @@ import (
 	"reflect"
 )
 
-const (
-	FindFlagFirst = iota
-	FindFlagLast
-	FindFlagAny
-)
-
 type FindFristValve struct {
 	BaseValve
 	ret reflect.Value
@@ -30,7 +24,7 @@ func (valve *FindFristValve) Begin(count int) error {
 	return nil
 }
 
-func (opt *FindFristValve) End() error {
+func (valve *FindFristValve) End() error {
 	return nil
 }
 
@@ -59,7 +53,7 @@ func (valve *FindLastValve) Begin(count int) error {
 	return nil
 }
 
-func (opt *FindLastValve) End() error {
+func (valve *FindLastValve) End() error {
 	return nil
 }
 
@@ -93,7 +87,7 @@ func (valve *FindAnyValve) Begin(count int) error {
 	return nil
 }
 
-func (opt *FindAnyValve) End() error {
+func (valve *FindAnyValve) End() error {
 	return nil
 }
 
