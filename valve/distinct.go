@@ -18,6 +18,12 @@ type DistinctValve struct {
 	sliceType reflect.Type
 }
 
+func (valve *DistinctValve) Reset() {
+	valve.last = reflect.Value{}
+	valve.slice = reflect.Value{}
+	valve.next.Reset()
+}
+
 func (valve *DistinctValve) Verify(t reflect.Type) error {
 	valve.sliceType = reflect.SliceOf(t)
 	if ! funcutil.VerifyEqualFunction(valve.fn, t) {

@@ -18,6 +18,11 @@ type SortValve struct {
 	sliceType reflect.Type
 }
 
+func (valve *SortValve) Reset() {
+	valve.slice = reflect.Value{}
+	valve.next.Reset()
+}
+
 func (valve *SortValve) Verify(t reflect.Type) error {
 	valve.sliceType = reflect.SliceOf(t)
 	if ! funcutil.VerifyCompareFunction(valve.fn, t) {

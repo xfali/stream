@@ -16,6 +16,12 @@ type LimitValve struct {
 	cur   int
 }
 
+func (valve *LimitValve) Reset() {
+	valve.ret = reflect.Value{}
+	valve.cur = 0
+	valve.next.Reset()
+}
+
 func (valve *LimitValve) Verify(t reflect.Type) error {
 	return  valve.next.Verify(t)
 }
@@ -55,6 +61,12 @@ type SkipValve struct {
 	ret  reflect.Value
 	Skip int
 	cur  int
+}
+
+func (valve *SkipValve) Reset() {
+	valve.ret = reflect.Value{}
+	valve.cur = 0
+	valve.next.Reset()
 }
 
 func (valve *SkipValve) Verify(t reflect.Type) error {

@@ -115,13 +115,13 @@ func (s *PipeStream) Foreach(eachFn interface{}) {
 }
 
 func (s *PipeStream) Peek(eachFn interface{}) Stream {
-	valve := &valve.ForeachValve{}
+	valve := &valve.PeekValve{}
 	valve.Init(eachFn)
 	s.v.Next(valve)
 	s.v = valve
 
 	s.each()
-
+	s.head.Reset()
 	return s
 }
 

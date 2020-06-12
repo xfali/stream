@@ -20,6 +20,7 @@ var DefaultCapacity = 64
 
 type FuncValve interface {
 	Init(fn interface{}) error
+	Reset()
 	Next(v FuncValve)
 
 	Verify(t reflect.Type) error
@@ -41,7 +42,7 @@ type BaseValve struct {
 }
 
 func CheckState(state, flag int) bool {
-	return state & flag != 0
+	return state&flag != 0
 }
 
 func SetState(state, flag int) int {
@@ -59,6 +60,11 @@ func (valve *BaseValve) Init(fn interface{}) error {
 
 func (valve *BaseValve) Next(v FuncValve) {
 	valve.next = v
+}
+func (valve *BaseValve) Reset() {
+	if valve.next != nil {
+		valve.next.Reset()
+	}
 }
 func (valve *BaseValve) SetState(state int) {
 	valve.state = state
