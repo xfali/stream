@@ -38,8 +38,10 @@ func (valve *LimitValve) End() error {
 
 func (valve *LimitValve) Accept(v reflect.Value) error {
 	if valve.cur < valve.Limit {
+		valve.cur++
 		return valve.next.Accept(v)
 	}
+	valve.cur++
 	return nil
 }
 
@@ -76,8 +78,10 @@ func (valve *SkipValve) End() error {
 
 func (valve *SkipValve) Accept(v reflect.Value) error {
 	if valve.cur >= valve.Skip {
+		valve.cur++
 		return valve.next.Accept(v)
 	}
+	valve.cur++
 	return nil
 }
 

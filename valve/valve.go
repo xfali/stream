@@ -16,6 +16,8 @@ const (
 	SORTED   = 1 << 1
 )
 
+var DefaultCapacity = 64
+
 type FuncValve interface {
 	Init(fn interface{}) error
 	Next(v FuncValve)

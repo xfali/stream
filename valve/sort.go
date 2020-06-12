@@ -26,7 +26,7 @@ func (valve *SortValve) Begin(count int) error {
 	if valve.state != SORTED {
 		cap := count
 		if count == -1 {
-			cap = 16
+			cap = DefaultCapacity
 		}
 		valve.slice = reflect.MakeSlice(valve.sliceType, 0, cap)
 	}

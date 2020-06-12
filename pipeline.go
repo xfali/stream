@@ -131,23 +131,21 @@ func (s *PipeStream) AllMatch(fn interface{}) bool {
 }
 
 func (s *PipeStream) Map(fn interface{}) Stream {
-	ret, err := funcutil.Map(fn, s.slice)
-	if err != nil {
-		panic(err)
-	}
-	return &PipeStream{
-		slice: ret,
-	}
+	valve := &valve.MapValve{}
+	valve.Init(fn)
+	s.v.Next(valve)
+	s.v = valve
+
+	return s
 }
 
 func (s *PipeStream) FlatMap(fn interface{}) Stream {
-	ret, err := funcutil.FlatMap(fn, s.slice)
-	if err != nil {
-		panic(err)
-	}
-	return &PipeStream{
-		slice: ret,
-	}
+	valve := &valve.FlatMapValve{}
+	valve.Init(fn)
+	s.v.Next(valve)
+	s.v = valve
+
+	return s
 }
 
 func (s *PipeStream) Reduce(fn, initValue interface{}) interface{} {
@@ -167,7 +165,11 @@ func (s *PipeStream) Reduce(fn, initValue interface{}) interface{} {
 }
 
 func (s *PipeStream) Collect() interface{} {
-	return s.slice
+	valve := &valve.CollectValve{}
+	s.v.Next(valve)
+	s.v = valve
+
+	return s.each()
 }
 
 func (s *PipeStream) each() interface{} {

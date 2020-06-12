@@ -8,6 +8,8 @@ package test
 import (
 	"github.com/xfali/stream"
 	"reflect"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -88,29 +90,35 @@ func TestPipeLimit(t *testing.T) {
 }
 
 func TestPipeSkip(t *testing.T) {
-	s := stream.Pipeline([]int{1, 2, 3, 4, 5})
-	s.Skip(2).Foreach(func(i int) {
-		t.Log(i)
-		if i == 1 || i == 2 {
-			t.Fatal("Skip 1、2 but got it")
-		}
-	})
-	s.Skip(0).Foreach(func(i int) {
-		switch i {
-		case 1, 2, 3, 4, 5:
+	t.Run("skip 2", func(t *testing.T) {
+		stream.Pipeline([]int{1, 2, 3, 4, 5}).Skip(2).Foreach(func(i int) {
 			t.Log(i)
-		default:
-			t.Fatal("cannot be here")
-		}
+			if i == 1 || i == 2 {
+				t.Fatal("Skip 1、2 but got it")
+			}
+		})
 	})
 
-	s.Skip(5).Foreach(func(i int) {
-		switch i {
-		case 1, 2, 3, 4, 5:
-			t.Fatal("cannot be here")
-		default:
-			t.Log(i)
-		}
+	t.Run("skip 0", func(t *testing.T) {
+		stream.Pipeline([]int{1, 2, 3, 4, 5}).Skip(0).Foreach(func(i int) {
+			switch i {
+			case 1, 2, 3, 4, 5:
+				t.Log(i)
+			default:
+				t.Fatal("cannot be here")
+			}
+		})
+	})
+
+	t.Run("skip 5", func(t *testing.T) {
+		stream.Pipeline([]int{1, 2, 3, 4, 5}).Skip(5).Foreach(func(i int) {
+			switch i {
+			case 1, 2, 3, 4, 5:
+				t.Fatal("cannot be here")
+			default:
+				t.Log(i)
+			}
+		})
 	})
 }
 
@@ -159,5 +167,46 @@ func TestPipeSort(t *testing.T) {
 		}).Foreach(func(i int) {
 			t.Log(i)
 		})
+	})
+}
+
+func TestPipeMap(t *testing.T) {
+	stream.Pipeline([]string{"1", "2", "3"}).Map(func(s string) int {
+		i, _ := strconv.Atoi(s)
+		return i
+	}).Foreach(func(i int) {
+		switch i {
+		case 1, 2, 3:
+			t.Log(i)
+		default:
+			t.Fatal("cannot be here")
+		}
+	})
+}
+
+func TestPipeFlatMap(t *testing.T) {
+	stream.Pipeline([]string{"hello world", "xfali stream"}).FlatMap(func(s string) []string {
+		return strings.Split(s, " ")
+	}).Foreach(func(i string) {
+		switch i {
+		case "hello", "world", "xfali", "stream":
+			t.Log(i)
+		default:
+			t.Fatal("cannot be here")
+		}
+	})
+
+	stream.Pipeline([]string{"1,2,3,4", "5,6,7,8"}).FlatMap(func(s string) []int {
+		return stream.Pipeline(strings.Split(s, ",")).Map(func(s string) int {
+			i, _ := strconv.Atoi(s)
+			return i
+		}).Collect().([]int)
+	}).Foreach(func(i int) {
+		switch i {
+		case 1, 2, 3, 4, 5, 6, 7, 8:
+			t.Log(i)
+		default:
+			t.Fatal("cannot be here")
+		}
 	})
 }

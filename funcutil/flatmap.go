@@ -17,7 +17,8 @@ func FlatMap(function, slice interface{}) (interface{}, error) {
 		return nil, errors.New("Limit The first param is not a slice ")
 	}
 	inType := in.Type().Elem()
-	ok, outType := verifyFlatMapFunction(fn, inType)
+	ok := VerifyFlatMapFunction(fn, inType)
+	outType := fn.Type().Out(0)
 	if !ok {
 		panic("distinct: Function must be of type func(" + inType.String() + ") []interface{}")
 	}
@@ -34,15 +35,15 @@ func FlatMap(function, slice interface{}) (interface{}, error) {
 	return out.Interface(), nil
 }
 
-func verifyFlatMapFunction(fn reflect.Value, elemType reflect.Type) (bool, reflect.Type) {
+func VerifyFlatMapFunction(fn reflect.Value, elemType reflect.Type) bool {
 	if fn.Kind() != reflect.Func {
-		return false, nil
+		return false
 	}
 	if fn.Type().NumIn() != 1 || fn.Type().NumOut() != 1 {
-		return false, nil
+		return false
 	}
 	if elemType != fn.Type().In(0) || reflect.Slice != fn.Type().Out(0).Kind() {
-		return false, nil
+		return false
 	}
-	return true, fn.Type().Out(0)
+	return true
 }
