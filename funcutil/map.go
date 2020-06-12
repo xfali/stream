@@ -3,7 +3,7 @@
 // @version V1.0
 // Description: 
 
-package stream
+package funcutil
 
 import (
 	"errors"
@@ -18,7 +18,8 @@ func Map(function, slice interface{}) (ret interface{}, err error) {
 	}
 	fn := reflect.ValueOf(function)
 	inType := in.Type().Elem()
-	ok, outType := verifyMapFuncType(fn, inType)
+	ok := VerifyMapFuncType(fn, inType)
+	outType := fn.Type().Out(0)
 	if !ok {
 		return nil, errors.New("map: Function must be of type func(" + inType.String() + ") outputElemType")
 	}
@@ -31,15 +32,15 @@ func Map(function, slice interface{}) (ret interface{}, err error) {
 	return out.Interface(), nil
 }
 
-func verifyMapFuncType(fn reflect.Value, elemType reflect.Type) (bool, reflect.Type) {
+func VerifyMapFuncType(fn reflect.Value, elemType reflect.Type) bool {
 	if fn.Kind() != reflect.Func {
-		return false, nil
+		return false
 	}
 	if fn.Type().NumIn() != 1 || fn.Type().NumOut() != 1 {
-		return false, nil
+		return false
 	}
 	if fn.Type().In(0) != elemType {
-		return false, nil
+		return false
 	}
-	return true, fn.Type().Out(0)
+	return true
 }

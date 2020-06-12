@@ -8,6 +8,7 @@ package stream
 import (
 	"errors"
 	"github.com/choleraehyq/gofunctools/functools"
+	"github.com/xfali/stream/funcutil"
 	"math/rand"
 	"reflect"
 )
@@ -41,7 +42,7 @@ func (s *SliceStream) Filter(fn interface{}) Stream {
 }
 
 func (s *SliceStream) Limit(size int) Stream {
-	ret, err := Limit(size, s.slice)
+	ret, err := funcutil.Limit(size, s.slice)
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +52,7 @@ func (s *SliceStream) Limit(size int) Stream {
 }
 
 func (s *SliceStream) Skip(size int) Stream {
-	ret, err := Skip(size, s.slice)
+	ret, err := funcutil.Skip(size, s.slice)
 	if err != nil {
 		panic(err)
 	}
@@ -61,7 +62,7 @@ func (s *SliceStream) Skip(size int) Stream {
 }
 
 func (s *SliceStream) Distinct(fn interface{}) Stream {
-	ret, err := Distinct(fn, s.slice)
+	ret, err := funcutil.Distinct(fn, s.slice)
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +72,7 @@ func (s *SliceStream) Distinct(fn interface{}) Stream {
 }
 
 func (s *SliceStream) Sort(fn interface{}) Stream {
-	ret, err := Sort(fn, s.slice)
+	ret, err := funcutil.Sort(fn, s.slice)
 	if err != nil {
 		panic(err)
 	}
@@ -126,6 +127,21 @@ func (s *SliceStream) Foreach(eachFn interface{}) {
 	}
 }
 
+func (s *SliceStream) Peek(eachFn interface{}) Stream {
+	in := reflect.ValueOf(s.slice)
+	fn := reflect.ValueOf(eachFn)
+	inType := in.Type().Elem()
+	if !verifyForeachFuncType(fn, inType) {
+		panic(errors.New("foreach Function must be of type func(" + inType.String() + ")"))
+	}
+	var param [1]reflect.Value
+	for i := 0; i < in.Len(); i++ {
+		param[0] = in.Index(i)
+		fn.Call(param[:])
+	}
+	return s
+}
+
 func (s *SliceStream) AnyMatch(fn interface{}) bool {
 	ret, err := functools.Any(fn, s.slice)
 	if err != nil {
@@ -143,7 +159,7 @@ func (s *SliceStream) AllMatch(fn interface{}) bool {
 }
 
 func (s *SliceStream) Map(fn interface{}) Stream {
-	ret, err := Map(fn, s.slice)
+	ret, err := funcutil.Map(fn, s.slice)
 	if err != nil {
 		panic(err)
 	}
@@ -153,7 +169,7 @@ func (s *SliceStream) Map(fn interface{}) Stream {
 }
 
 func (s *SliceStream) FlatMap(fn interface{}) Stream {
-	ret, err := flatMap(fn, s.slice)
+	ret, err := funcutil.FlatMap(fn, s.slice)
 	if err != nil {
 		panic(err)
 	}
@@ -170,7 +186,7 @@ func (s *SliceStream) Reduce(fn, initValue interface{}) interface{} {
 		}
 		return ret
 	} else {
-		ret, err := Reduce(fn, s.slice)
+		ret, err := funcutil.Reduce(fn, s.slice)
 		if err != nil {
 			panic(err)
 		}
