@@ -210,3 +210,91 @@ func TestPipeFlatMap(t *testing.T) {
 		}
 	})
 }
+
+func TestPipeCount(t *testing.T) {
+	t.Run("limit", func(t *testing.T) {
+		c := stream.Pipeline([]int{1, 2, 3, 4, 5}).Limit(2).Count()
+		if c != 2 {
+			t.Fatal("expect 2 but get: ", c)
+		}
+	})
+
+	t.Run("filter", func(t *testing.T) {
+		c := stream.Pipeline([]int{1, 2, 3, 4, 5}).Filter(func(a int) bool {
+			return a != 2
+		}).Count()
+		if c != 4 {
+			t.Fatal("expect 2 but get: ", c)
+		}
+	})
+}
+
+func TestPipeAnyMatch(t *testing.T) {
+	t.Run("true", func(t *testing.T) {
+		c := stream.Pipeline([]int{1, 2, 3, 4, 5}).AnyMatch(func(i int) bool {
+			return i == 3
+		})
+		if !c {
+			t.Fatal("expect true but get: ", c)
+		}
+	})
+
+	t.Run("false", func(t *testing.T) {
+		c := stream.Pipeline([]int{1, 2, 3, 4, 5}).AnyMatch(func(i int) bool {
+			return i == 6
+		})
+		if c {
+			t.Fatal("expect false but get: ", c)
+		}
+	})
+}
+
+func TestPipeAllMatch(t *testing.T) {
+	t.Run("true", func(t *testing.T) {
+		c := stream.Pipeline([]int{1, 2, 3, 4, 5}).AllMatch(func(i int) bool {
+			return i != 6
+		})
+		if !c {
+			t.Fatal("expect true but get: ", c)
+		}
+	})
+
+	t.Run("false", func(t *testing.T) {
+		c := stream.Pipeline([]int{1, 2, 3, 4, 5}).AllMatch(func(i int) bool {
+			return i != 4
+		})
+		if c {
+			t.Fatal("expect false but get: ", c)
+		}
+	})
+}
+
+
+func TestPipeReduce(t *testing.T) {
+	t.Run("without init value", func(t *testing.T) {
+		ret := stream.Pipeline([]int{1, 2, 3, 4, 5}).Reduce(func(d, o int) int {
+			return d + o
+		}, nil).(int)
+		if ret != 15 {
+			t.Fatal("expect 15 but get: ", ret)
+		}
+	})
+
+	t.Run("with init value", func(t *testing.T) {
+		ret := stream.Pipeline([]int{1, 2, 3, 4, 5}).Reduce(func(d, o int) int {
+			return d + o
+		}, 2).(int)
+		if ret != 17 {
+			t.Fatal("expect 17 but get: ", ret)
+		}
+	})
+
+	t.Run("with string init value", func(t *testing.T) {
+		ret :=  stream.Pipeline([]string{"w", "o", "r", "l", "d"}).Reduce(func(d, o string) string {
+			return d + o
+		}, "hello ").(string)
+		if ret != "hello world" {
+			t.Fatal("expect 15 but get: ", ret)
+		}
+	})
+}

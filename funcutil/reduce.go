@@ -30,7 +30,7 @@ func reduce(function, slice interface{}) (interface{}, error) {
 	}
 	fn := reflect.ValueOf(function)
 	inType := in.Type().Elem()
-	if !verifyReduceFuncType(fn, inType) {
+	if !VerifyReduceFuncType(fn, inType) {
 		panic("reduce: Function must be of type func(" + inType.String() + ")" + inType.String())
 	}
 
@@ -44,7 +44,7 @@ func reduce(function, slice interface{}) (interface{}, error) {
 	return out.Interface(), nil
 }
 
-func verifyReduceFuncType(fn reflect.Value, elemType reflect.Type) bool {
+func VerifyReduceFuncType(fn reflect.Value, elemType reflect.Type) bool {
 	if fn.Kind() != reflect.Func {
 		return false
 	}

@@ -6,8 +6,6 @@
 package stream
 
 import (
-	"github.com/choleraehyq/gofunctools/functools"
-	"github.com/xfali/stream/funcutil"
 	"github.com/xfali/stream/valve"
 	"reflect"
 )
@@ -32,8 +30,10 @@ func Pipeline(slice interface{}) *PipeStream {
 }
 
 func (s *PipeStream) Count() int {
-	v := reflect.ValueOf(s.slice)
-	return v.Len()
+	valve := &valve.CountValve{}
+	s.v.Next(valve)
+	s.v = valve
+	return s.each().(int)
 }
 
 func (s *PipeStream) Filter(fn interface{}) Stream {
@@ -115,19 +115,21 @@ func (s *PipeStream) Foreach(eachFn interface{}) {
 }
 
 func (s *PipeStream) AnyMatch(fn interface{}) bool {
-	ret, err := functools.Any(fn, s.slice)
-	if err != nil {
-		panic(err)
-	}
-	return ret
+	valve := &valve.MatchAnyValve{}
+	valve.Init(fn)
+	s.v.Next(valve)
+	s.v = valve
+
+	return s.each().(bool)
 }
 
 func (s *PipeStream) AllMatch(fn interface{}) bool {
-	ret, err := functools.All(fn, s.slice)
-	if err != nil {
-		panic(err)
-	}
-	return ret
+	valve := &valve.MatchAllValve{}
+	valve.Init(fn)
+	s.v.Next(valve)
+	s.v = valve
+
+	return s.each().(bool)
 }
 
 func (s *PipeStream) Map(fn interface{}) Stream {
@@ -149,19 +151,15 @@ func (s *PipeStream) FlatMap(fn interface{}) Stream {
 }
 
 func (s *PipeStream) Reduce(fn, initValue interface{}) interface{} {
+	valve := &valve.ReduceValve{}
 	if initValue != nil {
-		ret, err := functools.Reduce(fn, s.slice, initValue)
-		if err != nil {
-			panic(err)
-		}
-		return ret
-	} else {
-		ret, err := funcutil.Reduce(fn, s.slice)
-		if err != nil {
-			panic(err)
-		}
-		return ret
+		valve.V = reflect.ValueOf(initValue)
 	}
+	valve.Init(fn)
+	s.v.Next(valve)
+	s.v = valve
+
+	return s.each()
 }
 
 func (s *PipeStream) Collect() interface{} {

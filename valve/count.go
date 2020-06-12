@@ -11,9 +11,8 @@ import (
 
 type CountValve struct {
 	BaseValve
-	ret   reflect.Value
-	Limit int
 	cur   int
+	count int
 }
 
 func (valve *CountValve) Verify(t reflect.Type) bool {
@@ -21,15 +20,8 @@ func (valve *CountValve) Verify(t reflect.Type) bool {
 }
 
 func (valve *CountValve) Begin(count int) error {
-	if count == -1 {
-		return valve.next.Begin(-1)
-	} else {
-		if valve.Limit > count {
-			return valve.next.Begin(count)
-		} else {
-			return valve.next.Begin(valve.Limit)
-		}
-	}
+	valve.count = count
+	return nil
 }
 
 func (valve *CountValve) End() error {
@@ -37,14 +29,15 @@ func (valve *CountValve) End() error {
 }
 
 func (valve *CountValve) Accept(v reflect.Value) error {
-	if valve.cur < valve.Limit {
+	if valve.count == -1 {
 		valve.cur++
-		return valve.next.Accept(v)
 	}
-	valve.cur++
 	return nil
 }
 
 func (valve *CountValve) Result() reflect.Value {
-	return valve.next.Result()
+	if valve.count != -1 {
+		valve.cur = valve.count
+	}
+	return reflect.ValueOf(valve.cur)
 }
