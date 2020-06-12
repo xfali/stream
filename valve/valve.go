@@ -40,6 +40,14 @@ type BaseValve struct {
 	state int
 }
 
+func CheckState(state, flag int) bool {
+	return state & flag != 0
+}
+
+func SetState(state, flag int) int {
+	return state | flag
+}
+
 func (valve *BaseValve) Init(fn interface{}) error {
 	v := reflect.ValueOf(fn)
 	if v.Kind() != reflect.Func {

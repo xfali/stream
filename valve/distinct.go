@@ -20,7 +20,7 @@ func (valve *DistinctValve) Verify(t reflect.Type) bool {
 }
 
 func (valve *DistinctValve) Begin(count int) error {
-	if valve.state != DISTINCT && valve.state != SORTED {
+	if !CheckState(valve.state, DISTINCT) && !CheckState(valve.state, SORTED) {
 		cap := count
 		if count == -1 {
 			cap = DefaultCapacity
@@ -31,19 +31,19 @@ func (valve *DistinctValve) Begin(count int) error {
 }
 
 func (valve *DistinctValve) End() (err error) {
-	if valve.state != DISTINCT && valve.state != SORTED {
+	if !CheckState(valve.state, DISTINCT) && !CheckState(valve.state, SORTED) {
 		for i := 0; i < valve.slice.Len(); i++ {
 			err = valve.next.Accept(valve.slice.Index(i))
 		}
 	}
-	valve.state = DISTINCT
+	valve.state = SetState(valve.state, DISTINCT)
 	return valve.next.End()
 }
 
 func (valve *DistinctValve) Accept(v reflect.Value) error {
-	if valve.state == DISTINCT {
+	if CheckState(valve.state, DISTINCT) {
 		return valve.next.Accept(v)
-	} else if valve.state == SORTED {
+	} else if CheckState(valve.state, SORTED) {
 		if compare(valve.fn, valve.last, v) != 0 {
 			valve.last = v
 			return valve.next.Accept(v)

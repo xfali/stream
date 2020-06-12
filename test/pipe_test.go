@@ -269,7 +269,6 @@ func TestPipeAllMatch(t *testing.T) {
 	})
 }
 
-
 func TestPipeReduce(t *testing.T) {
 	t.Run("without init value", func(t *testing.T) {
 		ret := stream.Pipeline([]int{1, 2, 3, 4, 5}).Reduce(func(d, o int) int {
@@ -290,11 +289,33 @@ func TestPipeReduce(t *testing.T) {
 	})
 
 	t.Run("with string init value", func(t *testing.T) {
-		ret :=  stream.Pipeline([]string{"w", "o", "r", "l", "d"}).Reduce(func(d, o string) string {
+		ret := stream.Pipeline([]string{"w", "o", "r", "l", "d"}).Reduce(func(d, o string) string {
 			return d + o
 		}, "hello ").(string)
 		if ret != "hello world" {
 			t.Fatal("expect 15 but get: ", ret)
+		}
+	})
+}
+
+func TestPipeCountComplex(t *testing.T) {
+	t.Run("with string value", func(t *testing.T) {
+		ret := stream.Pipeline([]string{"123", "456", "789"}).Filter(func(s string) bool {
+			return s != "456"
+		}).FlatMap(func(s string) []string {
+			return strings.Split(s, "")
+		}).Map(func(s string) int {
+			i, _ := strconv.Atoi(s)
+			return i
+		}).Filter(func(i int) bool {
+			if i == 2 || i == 7 {
+				return false
+			}
+			return true
+		}).Count()
+
+		if ret != 4 {
+			t.Fatal("expect 4 but get: ", ret)
 		}
 	})
 }

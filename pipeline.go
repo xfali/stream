@@ -36,18 +36,18 @@ func (s *PipeStream) Count() int {
 	return s.each().(int)
 }
 
-func (s *PipeStream) Filter(fn interface{}) Stream {
-	valve := &valve.FilterValve{}
-	valve.Init(fn)
+func (s *PipeStream) Limit(size int) Stream {
+	valve := &valve.LimitValve{
+		Limit: size,
+	}
 	s.v.Next(valve)
 	s.v = valve
 	return s
 }
 
-func (s *PipeStream) Limit(size int) Stream {
-	valve := &valve.LimitValve{
-		Limit: size,
-	}
+func (s *PipeStream) Filter(fn interface{}) Stream {
+	valve := &valve.FilterValve{}
+	valve.Init(fn)
 	s.v.Next(valve)
 	s.v = valve
 	return s

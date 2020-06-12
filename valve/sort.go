@@ -23,7 +23,7 @@ func (valve *SortValve) Verify(t reflect.Type) bool {
 }
 
 func (valve *SortValve) Begin(count int) error {
-	if valve.state != SORTED {
+	if !CheckState(valve.state, SORTED) {
 		cap := count
 		if count == -1 {
 			cap = DefaultCapacity
@@ -34,7 +34,7 @@ func (valve *SortValve) Begin(count int) error {
 }
 
 func (valve *SortValve) End() (err error) {
-	if valve.state != SORTED {
+	if !CheckState(valve.state, SORTED) {
 		ss := funcutil.SortSlice{
 			V:        valve.slice,
 			Compare:  valve.fn,
@@ -45,12 +45,12 @@ func (valve *SortValve) End() (err error) {
 			err = valve.next.Accept(valve.slice.Index(i))
 		}
 	}
-	valve.state = SORTED
+	valve.state = SetState(valve.state, SORTED)
 	return valve.next.End()
 }
 
 func (valve *SortValve) Accept(v reflect.Value) error {
-	if valve.state == SORTED {
+	if CheckState(valve.state, SORTED) {
 		return valve.next.Accept(v)
 	} else {
 		valve.slice = reflect.Append(valve.slice, v)

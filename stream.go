@@ -38,6 +38,7 @@ type Stream interface {
 	Sort(fn interface{}) Stream
 
 	// 映射并扁平化为一个stream
+	// 参数类型为：fn func(OLD_TYPE) []NEW_TYPE
 	FlatMap(fn interface{}) Stream
 
 	// 由一个类型映射到另一个类型
