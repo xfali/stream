@@ -6,6 +6,7 @@
 package valve
 
 import (
+	"errors"
 	"github.com/xfali/stream/funcutil"
 	"reflect"
 	"sort"
@@ -17,9 +18,12 @@ type SortValve struct {
 	sliceType reflect.Type
 }
 
-func (valve *SortValve) Verify(t reflect.Type) bool {
+func (valve *SortValve) Verify(t reflect.Type) error {
 	valve.sliceType = reflect.SliceOf(t)
-	return VerifyCompareFunction(valve.fn, t)
+	if ! funcutil.VerifyCompareFunction(valve.fn, t) {
+		return errors.New("sort: Function must be of type func(" + t.String() + "," + t.String() + ") int")
+	}
+	return valve.next.Verify(t)
 }
 
 func (valve *SortValve) Begin(count int) error {
@@ -30,6 +34,7 @@ func (valve *SortValve) Begin(count int) error {
 		}
 		valve.slice = reflect.MakeSlice(valve.sliceType, 0, cap)
 	}
+	valve.next.SetState(SetState(valve.state, SORTED))
 	return valve.next.Begin(count)
 }
 

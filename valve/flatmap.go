@@ -6,6 +6,7 @@
 package valve
 
 import (
+	"errors"
 	"github.com/xfali/stream/funcutil"
 	"reflect"
 )
@@ -14,14 +15,15 @@ type FlatMapValve struct {
 	BaseValve
 }
 
-func (valve *FlatMapValve) Verify(t reflect.Type) bool {
+func (valve *FlatMapValve) Verify(t reflect.Type) error {
 	if !funcutil.VerifyFlatMapFunction(valve.fn, t) {
-		return false
+		return errors.New("flatmap: Function must be of type func(" + t.String() + ") []interface{}")
 	}
 	return valve.next.Verify(valve.fn.Type().Out(0).Elem())
 }
 
 func (valve *FlatMapValve) Begin(count int) error {
+	valve.next.SetState(valve.state)
 	return valve.next.Begin(-1)
 }
 

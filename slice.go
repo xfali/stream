@@ -127,6 +127,10 @@ func (s *SliceStream) Foreach(eachFn interface{}) {
 	}
 }
 
+func (s *PipeStream) Peek(fn interface{}) Stream {
+
+}
+
 func (s *SliceStream) AnyMatch(fn interface{}) bool {
 	ret, err := functools.Any(fn, s.slice)
 	if err != nil {

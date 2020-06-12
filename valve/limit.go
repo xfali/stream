@@ -16,11 +16,12 @@ type LimitValve struct {
 	cur   int
 }
 
-func (valve *LimitValve) Verify(t reflect.Type) bool {
-	return true
+func (valve *LimitValve) Verify(t reflect.Type) error {
+	return  valve.next.Verify(t)
 }
 
 func (valve *LimitValve) Begin(count int) error {
+	valve.next.SetState(valve.state)
 	if count == -1 {
 		return valve.next.Begin(-1)
 	} else {
@@ -56,11 +57,12 @@ type SkipValve struct {
 	cur  int
 }
 
-func (valve *SkipValve) Verify(t reflect.Type) bool {
-	return true
+func (valve *SkipValve) Verify(t reflect.Type) error {
+	return nil
 }
 
 func (valve *SkipValve) Begin(count int) error {
+	valve.next.SetState(valve.state)
 	if count == -1 {
 		return valve.next.Begin(-1)
 	} else {

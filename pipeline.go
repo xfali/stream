@@ -79,7 +79,7 @@ func (s *PipeStream) Sort(fn interface{}) Stream {
 }
 
 func (s *PipeStream) FindFirst() *Option {
-	valve := &valve.FindFristValve{}
+	valve := &valve.FindFirstValve{}
 	s.v.Next(valve)
 	s.v = valve
 
@@ -112,6 +112,10 @@ func (s *PipeStream) Foreach(eachFn interface{}) {
 	s.v = valve
 
 	s.each()
+}
+
+func (s *PipeStream) Peek(fn interface{}) Stream {
+
 }
 
 func (s *PipeStream) AnyMatch(fn interface{}) bool {
@@ -173,7 +177,10 @@ func (s *PipeStream) Collect() interface{} {
 func (s *PipeStream) each() interface{} {
 	in := reflect.ValueOf(s.slice)
 	inType := in.Type().Elem()
-	s.head.Verify(inType)
+	err := s.head.Verify(inType)
+	if err != nil {
+		panic(err)
+	}
 	s.head.Begin(in.Len())
 	for i := 0; i < in.Len(); i++ {
 		s.head.Accept(in.Index(i))

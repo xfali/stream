@@ -12,7 +12,7 @@ type MatchAnyValve struct {
 	ret bool
 }
 
-func (valve *MatchAnyValve) Verify(t reflect.Type) bool {
+func (valve *MatchAnyValve) Verify(t reflect.Type) error {
 	return VerifyFilterFuncType(valve.fn, t)
 }
 
@@ -44,7 +44,7 @@ type MatchAllValve struct {
 	ret bool
 }
 
-func (valve *MatchAllValve) Verify(t reflect.Type) bool {
+func (valve *MatchAllValve) Verify(t reflect.Type) error {
 	return VerifyFilterFuncType(valve.fn, t)
 }
 

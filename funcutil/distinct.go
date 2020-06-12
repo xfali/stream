@@ -21,7 +21,7 @@ func distinct(function, slice interface{}) (interface{}, error) {
 		return nil, errors.New("Limit The first param is not a slice ")
 	}
 	inType := in.Type().Elem()
-	if !verifyCompareFunction(fn, inType) {
+	if !VerifyEqualFunction(fn, inType) {
 		panic("distinct: Function must be of type func(" + inType.String() + "," + inType.String() + ") int")
 	}
 
@@ -33,7 +33,7 @@ func distinct(function, slice interface{}) (interface{}, error) {
 		for j := 0; j < out.Len(); j++ {
 			param[0] = in.Index(i)
 			param[1] = out.Index(j)
-			if fn.Call(param[:])[0].Int() == 0 {
+			if fn.Call(param[:])[0].Bool() {
 				found = true
 			}
 		}
@@ -44,14 +44,14 @@ func distinct(function, slice interface{}) (interface{}, error) {
 	return out.Interface(), nil
 }
 
-func verifyCompareFunction(fn reflect.Value, elemType reflect.Type) bool {
+func VerifyEqualFunction(fn reflect.Value, elemType reflect.Type) bool {
 	if fn.Kind() != reflect.Func {
 		return false
 	}
 	if fn.Type().NumIn() != 2 || fn.Type().NumOut() != 1 {
 		return false
 	}
-	if elemType != fn.Type().In(0) || elemType != fn.Type().In(1) || reflect.Int != fn.Type().Out(0).Kind() {
+	if elemType != fn.Type().In(0) || elemType != fn.Type().In(1) || reflect.Bool != fn.Type().Out(0).Kind() {
 		return false
 	}
 	return true

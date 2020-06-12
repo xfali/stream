@@ -13,7 +13,7 @@ type NoneValve struct {
 	BaseValve
 }
 
-func (valve *NoneValve) Verify(t reflect.Type) bool {
+func (valve *NoneValve) Verify(t reflect.Type) error {
 	return valve.next.Verify(t)
 }
 

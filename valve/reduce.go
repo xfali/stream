@@ -6,6 +6,7 @@
 package valve
 
 import (
+	"errors"
 	"github.com/xfali/stream/funcutil"
 	"reflect"
 )
@@ -15,8 +16,11 @@ type ReduceValve struct {
 	V reflect.Value
 }
 
-func (valve *ReduceValve) Verify(t reflect.Type) bool {
-	return funcutil.VerifyReduceFuncType(valve.fn, t)
+func (valve *ReduceValve) Verify(t reflect.Type) error {
+	if ! funcutil.VerifyReduceFuncType(valve.fn, t) {
+		return errors.New("reduce: Function must be of type func(" + t.String() + ")" + t.String())
+	}
+	return nil
 }
 
 func (valve *ReduceValve) Begin(count int) error {

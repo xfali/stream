@@ -15,8 +15,8 @@ type CountValve struct {
 	count int
 }
 
-func (valve *CountValve) Verify(t reflect.Type) bool {
-	return true
+func (valve *CountValve) Verify(t reflect.Type) error {
+	return nil
 }
 
 func (valve *CountValve) Begin(count int) error {

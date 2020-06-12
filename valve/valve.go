@@ -22,7 +22,7 @@ type FuncValve interface {
 	Init(fn interface{}) error
 	Next(v FuncValve)
 
-	Verify(t reflect.Type) bool
+	Verify(t reflect.Type) error
 
 	Begin(t int) error
 	End() error
@@ -59,7 +59,6 @@ func (valve *BaseValve) Init(fn interface{}) error {
 
 func (valve *BaseValve) Next(v FuncValve) {
 	valve.next = v
-	v.SetState(valve.state)
 }
 func (valve *BaseValve) SetState(state int) {
 	valve.state = state

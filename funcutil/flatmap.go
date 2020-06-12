@@ -20,7 +20,7 @@ func FlatMap(function, slice interface{}) (interface{}, error) {
 	ok := VerifyFlatMapFunction(fn, inType)
 	outType := fn.Type().Out(0)
 	if !ok {
-		panic("distinct: Function must be of type func(" + inType.String() + ") []interface{}")
+		panic("flatmap: Function must be of type func(" + inType.String() + ") []interface{}")
 	}
 
 	out := reflect.MakeSlice(outType, 0, in.Len())

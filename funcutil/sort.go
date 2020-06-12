@@ -22,7 +22,7 @@ func sort(function, slice interface{}) (interface{}, error) {
 	}
 	fn := reflect.ValueOf(function)
 	inType := in.Type().Elem()
-	if !verifyCompareFunction(fn, inType) {
+	if !VerifyCompareFunction(fn, inType) {
 		panic("sort: Function must be of type func(" + inType.String() + "," + inType.String() + ") int")
 	}
 
@@ -54,4 +54,17 @@ func (p *SortSlice) Less(i, j int) bool {
 
 func (p *SortSlice) Swap(i, j int) {
 	p.SwapFunc(i, j)
+}
+
+func VerifyCompareFunction(fn reflect.Value, elemType reflect.Type) bool {
+	if fn.Kind() != reflect.Func {
+		return false
+	}
+	if fn.Type().NumIn() != 2 || fn.Type().NumOut() != 1 {
+		return false
+	}
+	if elemType != fn.Type().In(0) || elemType != fn.Type().In(1) || reflect.Int != fn.Type().Out(0).Kind() {
+		return false
+	}
+	return true
 }

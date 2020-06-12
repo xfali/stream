@@ -5,7 +5,11 @@
 
 package valve
 
-import "reflect"
+import (
+	"fmt"
+	"github.com/xfali/stream/funcutil"
+	"reflect"
+)
 
 type DistinctValve struct {
 	BaseValve
@@ -14,9 +18,12 @@ type DistinctValve struct {
 	sliceType reflect.Type
 }
 
-func (valve *DistinctValve) Verify(t reflect.Type) bool {
+func (valve *DistinctValve) Verify(t reflect.Type) error {
 	valve.sliceType = reflect.SliceOf(t)
-	return VerifyCompareFunction(valve.fn, t)
+	if ! funcutil.VerifyEqualFunction(valve.fn, t) {
+		return fmt.Errorf("distinct: Function must be of type func(%s, %s) bool", t.String(), t.String())
+	}
+	return valve.next.Verify(t)
 }
 
 func (valve *DistinctValve) Begin(count int) error {
@@ -27,6 +34,7 @@ func (valve *DistinctValve) Begin(count int) error {
 		}
 		valve.slice = reflect.MakeSlice(valve.sliceType, 0, cap)
 	}
+	valve.next.SetState(SetState(valve.state, DISTINCT))
 	return valve.next.Begin(count)
 }
 
@@ -44,14 +52,14 @@ func (valve *DistinctValve) Accept(v reflect.Value) error {
 	if CheckState(valve.state, DISTINCT) {
 		return valve.next.Accept(v)
 	} else if CheckState(valve.state, SORTED) {
-		if compare(valve.fn, valve.last, v) != 0 {
+		if !valve.last.IsValid() || !equal(valve.fn, valve.last, v) {
 			valve.last = v
 			return valve.next.Accept(v)
 		}
 	} else {
 		found := false
 		for i := 0; i < valve.slice.Len(); i++ {
-			if compare(valve.fn, valve.slice.Index(i), v) == 0 {
+			if equal(valve.fn, valve.slice.Index(i), v) {
 				found = true
 			}
 		}
@@ -66,15 +74,9 @@ func (valve *DistinctValve) Result() reflect.Value {
 	return valve.next.Result()
 }
 
-func VerifyCompareFunction(fn reflect.Value, elemType reflect.Type) bool {
-	if fn.Kind() != reflect.Func {
-		return false
-	}
-	if fn.Type().NumIn() != 2 || fn.Type().NumOut() != 1 {
-		return false
-	}
-	if elemType != fn.Type().In(0) || elemType != fn.Type().In(1) || reflect.Int != fn.Type().Out(0).Kind() {
-		return false
-	}
-	return true
+func equal(fn, v1, v2 reflect.Value) bool {
+	var param [2]reflect.Value
+	param[0] = v1
+	param[1] = v2
+	return fn.Call(param[:])[0].Bool()
 }

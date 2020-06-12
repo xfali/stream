@@ -6,6 +6,7 @@
 package valve
 
 import (
+	"errors"
 	"github.com/xfali/stream/funcutil"
 	"reflect"
 )
@@ -14,14 +15,15 @@ type MapValve struct {
 	BaseValve
 }
 
-func (valve *MapValve) Verify(t reflect.Type) bool {
+func (valve *MapValve) Verify(t reflect.Type) error {
 	if !funcutil.VerifyMapFuncType(valve.fn, t) {
-		return false
+		return errors.New("map:  Function must be of type func(" + t.String() + ") newtype")
 	}
 	return valve.next.Verify(valve.fn.Type().Out(0))
 }
 
 func (valve *MapValve) Begin(count int) error {
+	valve.next.SetState(valve.state)
 	return valve.next.Begin(count)
 }
 

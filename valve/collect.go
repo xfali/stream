@@ -14,9 +14,9 @@ type CollectValve struct {
 	slice reflect.Value
 }
 
-func (valve *CollectValve) Verify(t reflect.Type) bool {
+func (valve *CollectValve) Verify(t reflect.Type) error {
 	valve.slice = reflect.MakeSlice(reflect.SliceOf(t), 0, DefaultCapacity)
-	return true
+	return nil
 }
 
 func (valve *CollectValve) Begin(count int) error {

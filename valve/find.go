@@ -10,25 +10,25 @@ import (
 	"reflect"
 )
 
-type FindFristValve struct {
+type FindFirstValve struct {
 	BaseValve
 	ret reflect.Value
 	set bool
 }
 
-func (valve *FindFristValve) Verify(t reflect.Type) bool {
-	return true
-}
-
-func (valve *FindFristValve) Begin(count int) error {
+func (valve *FindFirstValve) Verify(t reflect.Type) error {
 	return nil
 }
 
-func (valve *FindFristValve) End() error {
+func (valve *FindFirstValve) Begin(count int) error {
 	return nil
 }
 
-func (valve *FindFristValve) Accept(v reflect.Value) error {
+func (valve *FindFirstValve) End() error {
+	return nil
+}
+
+func (valve *FindFirstValve) Accept(v reflect.Value) error {
 	if !valve.set {
 		valve.ret = v
 		valve.set = true
@@ -36,7 +36,7 @@ func (valve *FindFristValve) Accept(v reflect.Value) error {
 	return nil
 }
 
-func (valve *FindFristValve) Result() reflect.Value {
+func (valve *FindFirstValve) Result() reflect.Value {
 	return valve.ret
 }
 
@@ -45,8 +45,8 @@ type FindLastValve struct {
 	ret reflect.Value
 }
 
-func (valve *FindLastValve) Verify(t reflect.Type) bool {
-	return true
+func (valve *FindLastValve) Verify(t reflect.Type) error {
+	return nil
 }
 
 func (valve *FindLastValve) Begin(count int) error {
@@ -74,8 +74,8 @@ type FindAnyValve struct {
 	values []reflect.Value
 }
 
-func (valve *FindAnyValve) Verify(t reflect.Type) bool {
-	return true
+func (valve *FindAnyValve) Verify(t reflect.Type) error {
+	return nil
 }
 
 func (valve *FindAnyValve) Begin(count int) error {

@@ -5,13 +5,16 @@
 
 package valve
 
-import "reflect"
+import (
+	"errors"
+	"reflect"
+)
 
 type ForeachValve struct {
 	BaseValve
 }
 
-func (valve *ForeachValve) Verify(t reflect.Type) bool {
+func (valve *ForeachValve) Verify(t reflect.Type) error {
 	return VerifyForeachFuncType(valve.fn, t)
 }
 
@@ -34,15 +37,15 @@ func (valve *ForeachValve) Result() reflect.Value {
 	return reflect.Value{}
 }
 
-func VerifyForeachFuncType(fn reflect.Value, elemType reflect.Type) bool {
+func VerifyForeachFuncType(fn reflect.Value, elemType reflect.Type) error {
 	if fn.Kind() != reflect.Func {
-		return false
+		return errors.New("foreach:  Function must be of type func(" + elemType.String() + ")")
 	}
 	if fn.Type().NumIn() != 1 || fn.Type().NumOut() != 0 {
-		return false
+		return errors.New("foreach:  Function must be of type func(" + elemType.String() + ")")
 	}
 	if fn.Type().In(0) != elemType {
-		return false
+		return errors.New("foreach:  Function must be of type func(" + elemType.String() + ")")
 	}
-	return true
+	return nil
 }

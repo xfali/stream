@@ -30,7 +30,7 @@ type Stream interface {
 	Skip(size int) Stream
 
 	// 返回一个去重的stream
-	// 参数类型为：fn func(t1, t2 TYPE) int
+	// 参数类型为：fn func(t1, t2 TYPE) bool
 	Distinct(fn interface{}) Stream
 
 	// 返回一个排序后的stream
@@ -48,6 +48,10 @@ type Stream interface {
 	// 迭代流中所有数据
 	// 参数类型为：fn func(TYPE)
 	Foreach(fn interface{})
+
+	// 迭代流中所有数据，并返回stream
+	// 参数类型为：fn func(TYPE)
+	Peek(fn interface{}) Stream
 
 	// 任意匹配一个则返回true，否则返回false
 	// 参数类型为：fn func(TYPE) bool
