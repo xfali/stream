@@ -15,7 +15,7 @@ import (
 
 var newFunc = stream.Pipeline
 
-func TestPipeFilter(t *testing.T) {
+func TestStreamFilter(t *testing.T) {
 	s := newFunc([]int{1, 2, 3, 4, 5})
 	s.Filter(func(i int) bool {
 		if i == 2 {
@@ -31,7 +31,7 @@ func TestPipeFilter(t *testing.T) {
 	})
 }
 
-func TestPipeFirst(t *testing.T) {
+func TestStreamFirst(t *testing.T) {
 	s := newFunc([]int{1, 2, 3, 4, 5})
 	o := s.FindFirst()
 	if !reflect.DeepEqual(1, o.Get()) {
@@ -39,7 +39,7 @@ func TestPipeFirst(t *testing.T) {
 	}
 }
 
-func TestPipeLast(t *testing.T) {
+func TestStreamLast(t *testing.T) {
 	s := newFunc([]int{1, 2, 3, 4, 5})
 	o := s.FindLast()
 	if !reflect.DeepEqual(5, o.Get()) {
@@ -47,7 +47,7 @@ func TestPipeLast(t *testing.T) {
 	}
 }
 
-func TestPipeFindAny(t *testing.T) {
+func TestStreamFindAny(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		s := newFunc([]int{1, 2, 3, 4, 5})
 		t.Log(s.FindAny().Get())
@@ -64,7 +64,7 @@ func TestPipeFindAny(t *testing.T) {
 	}
 }
 
-func TestPipeLimit(t *testing.T) {
+func TestStreamLimit(t *testing.T) {
 	s := newFunc([]int{1, 2, 3, 4, 5})
 	s.Limit(2).Foreach(func(i int) {
 		t.Log(i)
@@ -91,7 +91,7 @@ func TestPipeLimit(t *testing.T) {
 	})
 }
 
-func TestPipeSkip(t *testing.T) {
+func TestStreamSkip(t *testing.T) {
 	t.Run("skip 2", func(t *testing.T) {
 		newFunc([]int{1, 2, 3, 4, 5}).Skip(2).Foreach(func(i int) {
 			t.Log(i)
@@ -124,7 +124,7 @@ func TestPipeSkip(t *testing.T) {
 	})
 }
 
-func TestPipeLimitSkip(t *testing.T) {
+func TestStreamLimitSkip(t *testing.T) {
 	s := newFunc([]int{1, 2, 3, 4, 5})
 	s.Skip(2).Limit(1).Foreach(func(i int) {
 		t.Log(i)
@@ -134,7 +134,7 @@ func TestPipeLimitSkip(t *testing.T) {
 	})
 }
 
-func TestPipeDistinct(t *testing.T) {
+func TestStreamDistinct(t *testing.T) {
 	t.Run("distinct", func(t *testing.T) {
 		newFunc([]int{1, 2, 2, 4, 5}).Distinct(func(a, b int) bool {
 			return a == b
@@ -164,7 +164,7 @@ func TestPipeDistinct(t *testing.T) {
 	})
 }
 
-func TestPipeSort(t *testing.T) {
+func TestStreamSort(t *testing.T) {
 	t.Run("asc", func(t *testing.T) {
 		s := newFunc([]int{5, 2, 3, 1, 4})
 		s.Sort(func(a, b int) int {
@@ -204,7 +204,7 @@ func TestPipeSort(t *testing.T) {
 	})
 }
 
-func TestPipeMap(t *testing.T) {
+func TestStreamMap(t *testing.T) {
 	newFunc([]string{"1", "2", "3"}).Map(func(s string) int {
 		i, _ := strconv.Atoi(s)
 		return i
@@ -218,7 +218,7 @@ func TestPipeMap(t *testing.T) {
 	})
 }
 
-func TestPipeFlatMap(t *testing.T) {
+func TestStreamFlatMap(t *testing.T) {
 	newFunc([]string{"hello world", "xfali stream"}).FlatMap(func(s string) []string {
 		return strings.Split(s, " ")
 	}).Foreach(func(i string) {
@@ -245,7 +245,7 @@ func TestPipeFlatMap(t *testing.T) {
 	})
 }
 
-func TestPipeCount(t *testing.T) {
+func TestStreamCount(t *testing.T) {
 	t.Run("limit", func(t *testing.T) {
 		c := newFunc([]int{1, 2, 3, 4, 5}).Limit(2).Count()
 		if c != 2 {
@@ -263,7 +263,65 @@ func TestPipeCount(t *testing.T) {
 	})
 }
 
-func TestPipeAnyMatch(t *testing.T) {
+func TestStreamForeach(t *testing.T) {
+	t.Run("limit", func(t *testing.T) {
+		newFunc([]int{1, 2, 3, 4, 5}).Limit(2).Foreach(func(i int) {
+			switch i {
+			case 1,2:
+				t.Log(i)
+			default:
+				t.Fatal("cannot be here")
+			}
+		})
+	})
+
+	t.Run("filter", func(t *testing.T) {
+		newFunc([]int{1, 2, 3, 4, 5}).Filter(func(a int) bool {
+			return a != 2
+		}).Foreach(func(i int) {
+			switch i {
+			case 1,3,4,5:
+				t.Log(i)
+			default:
+				t.Fatal("cannot be here")
+			}
+		})
+	})
+}
+
+func TestStreamPeek(t *testing.T) {
+	t.Run("limit", func(t *testing.T) {
+		c := newFunc([]int{1, 2, 3, 4, 5}).Limit(2).Peek(func(i int) {
+			switch i {
+			case 1,2:
+				t.Log(i)
+			default:
+				t.Fatal("cannot be here")
+			}
+		}).Count()
+		if c != 2 {
+			t.Fatal("expect 2 but get: ", c)
+		}
+	})
+
+	t.Run("filter", func(t *testing.T) {
+		c := newFunc([]int{1, 2, 3, 4, 5}).Filter(func(a int) bool {
+			return a != 2
+		}).Peek(func(i int) {
+			switch i {
+			case 1,3,4,5:
+				t.Log(i)
+			default:
+				t.Fatal("cannot be here")
+			}
+		}).Count()
+		if c != 4 {
+			t.Fatal("expect 2 but get: ", c)
+		}
+	})
+}
+
+func TestStreamAnyMatch(t *testing.T) {
 	t.Run("true", func(t *testing.T) {
 		c := newFunc([]int{1, 2, 3, 4, 5}).AnyMatch(func(i int) bool {
 			return i == 3
@@ -283,7 +341,7 @@ func TestPipeAnyMatch(t *testing.T) {
 	})
 }
 
-func TestPipeAllMatch(t *testing.T) {
+func TestStreamAllMatch(t *testing.T) {
 	t.Run("true", func(t *testing.T) {
 		c := newFunc([]int{1, 2, 3, 4, 5}).AllMatch(func(i int) bool {
 			return i != 6
@@ -303,7 +361,7 @@ func TestPipeAllMatch(t *testing.T) {
 	})
 }
 
-func TestPipeReduce(t *testing.T) {
+func TestStreamReduce(t *testing.T) {
 	t.Run("without init value", func(t *testing.T) {
 		ret := newFunc([]int{1, 2, 3, 4, 5}).Reduce(func(d, o int) int {
 			return d + o
@@ -332,7 +390,7 @@ func TestPipeReduce(t *testing.T) {
 	})
 }
 
-func TestPipeCountComplex(t *testing.T) {
+func TestStreamCountComplex(t *testing.T) {
 	t.Run("with string value", func(t *testing.T) {
 		ret := newFunc([]string{"123", "456", "789"}).Filter(func(s string) bool {
 			return s != "456"
@@ -354,7 +412,7 @@ func TestPipeCountComplex(t *testing.T) {
 	})
 }
 
-func TestPipeForeachComplex(t *testing.T) {
+func TestStreamForeachComplex(t *testing.T) {
 	t.Run("with string value", func(t *testing.T) {
 		newFunc([]string{"5646", "3221", "7789"}).Filter(func(s string) bool {
 			return s != "5646"

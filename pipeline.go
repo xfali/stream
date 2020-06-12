@@ -114,8 +114,15 @@ func (s *PipeStream) Foreach(eachFn interface{}) {
 	s.each()
 }
 
-func (s *PipeStream) Peek(fn interface{}) Stream {
+func (s *PipeStream) Peek(eachFn interface{}) Stream {
+	valve := &valve.ForeachValve{}
+	valve.Init(eachFn)
+	s.v.Next(valve)
+	s.v = valve
 
+	s.each()
+
+	return s
 }
 
 func (s *PipeStream) AnyMatch(fn interface{}) bool {

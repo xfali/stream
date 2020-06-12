@@ -127,8 +127,19 @@ func (s *SliceStream) Foreach(eachFn interface{}) {
 	}
 }
 
-func (s *PipeStream) Peek(fn interface{}) Stream {
-
+func (s *SliceStream) Peek(eachFn interface{}) Stream {
+	in := reflect.ValueOf(s.slice)
+	fn := reflect.ValueOf(eachFn)
+	inType := in.Type().Elem()
+	if !verifyForeachFuncType(fn, inType) {
+		panic(errors.New("foreach Function must be of type func(" + inType.String() + ")"))
+	}
+	var param [1]reflect.Value
+	for i := 0; i < in.Len(); i++ {
+		param[0] = in.Index(i)
+		fn.Call(param[:])
+	}
+	return s
 }
 
 func (s *SliceStream) AnyMatch(fn interface{}) bool {
