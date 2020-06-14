@@ -1,4 +1,10 @@
 # stream
+支持stream处理的数据有：
+|  类型   | 说明  |
+|  :----  | :----  |
+| slice  | go切片 |
+| list  | go list.List |
+
 stream是一个数据处理工具，支持方法如下：
 |  方法   | 说明  |
 |  :----  | :----  |
@@ -24,23 +30,51 @@ stream是一个数据处理工具，支持方法如下：
 stream的实现使用惰性求值（Lazy Evaluation）的计算方式以获取更高的性能。
 
 ## 安装
-```cassandraql
+```
 go get github.com/xfali/stream
 ```
 
 ## 使用
-例子：
-```cassandraql
-s := stream.Slice([]int{1, 2, 3, 4, 5})
-s.Filter(func(i int) bool {
-    if i == 2 {
-        return false
-    }
-    return true
-}).Foreach(func(i int) {
-    if i == 2 {
-        t.Fatal("filter 2 but got it")
-    }
+slice例子：
+```
+testSlice := []string{"0,1,3,2,2,4", "5,8,7,6,7,9"}
+stream.Slice(testSlice).FlatMap(func(s string) []int {
+    return stream.Slice(strings.Split(s, ",")).Map(func(s string) int {
+        i, _ := strconv.Atoi(s)
+        return i
+    }).Collect().([]int)
+}).Filter(func(i int) bool {
+    return i != 5
+}).Sort(func(a, b int) int {
+    return a - b
+}).Distinct(func(a, b int) bool {
+    return a == b
+}).Map(func(i int) string {
+    return strconv.Itoa(i)
+}).Foreach(func(s string) {
+    t.Log(s)
+})
+```
+list例子：
+```
+testList := list.New()
+testList.PushBack("0,1,3,2,2,4")
+testList.PushBack("5,8,7,6,7,9")
+stream.List(testList).FlatMap(func(s string) []int {
+    return stream.Slice(strings.Split(s, ",")).Map(func(s string) int {
+        i, _ := strconv.Atoi(s)
+        return i
+    }).Collect().([]int)
+}).Filter(func(i int) bool {
+    return i != 5
+}).Sort(func(a, b int) int {
+    return a - b
+}).Distinct(func(a, b int) bool {
+    return a == b
+}).Map(func(i int) string {
+    return strconv.Itoa(i)
+}).Foreach(func(s string) {
+    t.Log(s)
 })
 ```
 
