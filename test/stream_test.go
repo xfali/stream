@@ -418,20 +418,78 @@ func TestStreamForeachComplex(t *testing.T) {
 			return s != "5646"
 		}).FlatMap(func(s string) []string {
 			return strings.Split(s, "")
+		}).Peek(func(s string) {
+			t.Logf("after flatmap: %s\n", s)
 		}).Map(func(s string) int {
 			i, _ := strconv.Atoi(s)
 			return i
+		}).Peek(func(d int) {
+			t.Logf("after map: %d\n", d)
 		}).Sort(func(a, b int) int {
 			return a - b
+		}).Peek(func(v int) {
+			t.Logf("after Sort: %d\n", v)
 		}).Distinct(func(a, b int) bool {
 			return a == b
+		}).Peek(func(v int) {
+			t.Logf("after distincet: %d\n", v)
 		}).Filter(func(i int) bool {
 			if i == 2 || i == 7 {
 				return false
 			}
 			return true
+		}).Peek(func(v int) {
+			t.Logf("after fiter: %d\n", v)
 		}).Foreach(func(i int) {
 			t.Log(i)
 		})
+	})
+}
+
+func BenchmarkPipeline(b *testing.B) {
+	b.Run("pipeline", func(b *testing.B) {
+		for i:=0; i<b.N; i++ {
+			stream.Pipeline([]string{"5646", "3221", "7789"}).Filter(func(s string) bool {
+				return s != "5646"
+			}).FlatMap(func(s string) []string {
+				return strings.Split(s, "")
+			}).Map(func(s string) int {
+				i, _ := strconv.Atoi(s)
+				return i
+			}).Sort(func(a, b int) int {
+				return a - b
+			}).Distinct(func(a, b int) bool {
+				return a == b
+			}).Filter(func(i int) bool {
+				if i == 2 || i == 7 {
+					return false
+				}
+				return true
+			}).Foreach(func(i int) {
+				//b.Log(i)
+			})
+		}
+	})
+
+	b.Run("simple_slice", func(b *testing.B) {
+		for i:=0; i<b.N; i++ {
+			stream.Slice([]string{"5646", "3221", "7789"}).Filter(func(s string) bool {
+				return s != "5646"
+			}).FlatMap(func(s string) []string {
+				return strings.Split(s, "")
+			}).Map(func(s string) int {
+				i, _ := strconv.Atoi(s)
+				return i
+			}).Sort(func(a, b int) int {
+				return a - b
+			}).Distinct(func(a, b int) bool {
+				return a == b
+			}).Filter(func(i int) bool {
+				if i == 2 || i == 7 {
+					return false
+				}
+				return true
+			}).Count()
+		}
 	})
 }

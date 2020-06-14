@@ -40,7 +40,7 @@ func (valve *LimitValve) Begin(count int) error {
 }
 
 func (valve *LimitValve) End() error {
-	return nil
+	return valve.next.End()
 }
 
 func (valve *LimitValve) Accept(v reflect.Value) error {

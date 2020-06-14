@@ -119,9 +119,6 @@ func (s *PipeStream) Peek(eachFn interface{}) Stream {
 	valve.Init(eachFn)
 	s.v.Next(valve)
 	s.v = valve
-
-	s.each()
-	s.head.Reset()
 	return s
 }
 
@@ -188,11 +185,20 @@ func (s *PipeStream) each() interface{} {
 	if err != nil {
 		panic(err)
 	}
-	s.head.Begin(in.Len())
-	for i := 0; i < in.Len(); i++ {
-		s.head.Accept(in.Index(i))
+	err = s.head.Begin(in.Len())
+	if err != nil {
+		panic(err)
 	}
-	s.head.End()
+	for i := 0; i < in.Len(); i++ {
+		err = s.head.Accept(in.Index(i))
+		if err != nil {
+			panic(err)
+		}
+	}
+	err = s.head.End()
+	if err != nil {
+		panic(err)
+	}
 	v := s.head.Result()
 	if v.IsValid() {
 		return v.Interface()

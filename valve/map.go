@@ -28,7 +28,7 @@ func (valve *MapValve) Begin(count int) error {
 }
 
 func (valve *MapValve) End() error {
-	return nil
+	return valve.next.End()
 }
 
 func (valve *MapValve) Accept(v reflect.Value) error {
