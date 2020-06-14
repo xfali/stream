@@ -14,10 +14,14 @@ stream是一个数据处理工具，支持方法如下：
 | FlatMap  | 映射并扁平化为一个stream |
 | Map  | 由一个类型映射到另一个类型 |
 | Foreach  | 迭代流中所有数据 |
+| Peek  | 获取中间计算的值，主要用于调试 |
 | AnyMatch  | 任意匹配一个则返回true，否则返回false |
 | AllMatch  | 完全匹配返回true，否则返回false |
 | Reduce  | 对stream中元素进行聚合求值 |
 | Collect  | 获得slice |
+
+## 惰性求值
+stream的实现使用惰性求值（Lazy Evaluation）的计算方式以获取更高的性能。
 
 ## 安装
 ```cassandraql

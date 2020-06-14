@@ -7,6 +7,7 @@ package test
 
 import (
 	"github.com/xfali/stream"
+	"math/rand"
 	"reflect"
 	"strconv"
 	"strings"
@@ -441,15 +442,86 @@ func TestStreamForeachComplex(t *testing.T) {
 		}).Peek(func(v int) {
 			t.Logf("after fiter: %d\n", v)
 		}).Foreach(func(i int) {
-			t.Log(i)
+			t.Log("foreach ", i)
 		})
 	})
 }
 
-func BenchmarkPipeline(b *testing.B) {
+func makeSlice() []string {
+	var ret []string
+	for i:=0; i<256; i++ {
+		ret = append(ret, strconv.Itoa(rand.Intn(99999999)))
+	}
+	return ret
+}
+
+func BenchmarkPipelineSimpleCount(b *testing.B) {
+	benchSlice := makeSlice()
 	b.Run("pipeline", func(b *testing.B) {
 		for i:=0; i<b.N; i++ {
-			stream.Pipeline([]string{"5646", "3221", "7789"}).Filter(func(s string) bool {
+			stream.Pipeline(benchSlice).Count()
+		}
+	})
+
+	b.Run("simple_slice", func(b *testing.B) {
+		for i:=0; i<b.N; i++ {
+			stream.SimpleSlice(benchSlice).Count()
+		}
+	})
+}
+
+func BenchmarkPipelineCount(b *testing.B) {
+	benchSlice := makeSlice()
+	b.Run("pipeline", func(b *testing.B) {
+		for i:=0; i<b.N; i++ {
+			stream.Pipeline(benchSlice).Filter(func(s string) bool {
+				return s != "5646"
+			}).FlatMap(func(s string) []string {
+				return strings.Split(s, "")
+			}).Map(func(s string) int {
+				i, _ := strconv.Atoi(s)
+				return i
+			}).Sort(func(a, b int) int {
+				return a - b
+			}).Distinct(func(a, b int) bool {
+				return a == b
+			}).Filter(func(i int) bool {
+				if i == 2 || i == 7 {
+					return false
+				}
+				return true
+			}).Count()
+		}
+	})
+
+	b.Run("simple_slice", func(b *testing.B) {
+		for i:=0; i<b.N; i++ {
+			stream.SimpleSlice(benchSlice).Filter(func(s string) bool {
+				return s != "5646"
+			}).FlatMap(func(s string) []string {
+				return strings.Split(s, "")
+			}).Map(func(s string) int {
+				i, _ := strconv.Atoi(s)
+				return i
+			}).Sort(func(a, b int) int {
+				return a - b
+			}).Distinct(func(a, b int) bool {
+				return a == b
+			}).Filter(func(i int) bool {
+				if i == 2 || i == 7 {
+					return false
+				}
+				return true
+			}).Count()
+		}
+	})
+}
+
+func BenchmarkPipelineForeach(b *testing.B) {
+	benchSlice := makeSlice()
+	b.Run("pipeline", func(b *testing.B) {
+		for i:=0; i<b.N; i++ {
+			stream.Pipeline(benchSlice).Filter(func(s string) bool {
 				return s != "5646"
 			}).FlatMap(func(s string) []string {
 				return strings.Split(s, "")
@@ -473,7 +545,7 @@ func BenchmarkPipeline(b *testing.B) {
 
 	b.Run("simple_slice", func(b *testing.B) {
 		for i:=0; i<b.N; i++ {
-			stream.Slice([]string{"5646", "3221", "7789"}).Filter(func(s string) bool {
+			stream.SimpleSlice(benchSlice).Filter(func(s string) bool {
 				return s != "5646"
 			}).FlatMap(func(s string) []string {
 				return strings.Split(s, "")
@@ -489,7 +561,9 @@ func BenchmarkPipeline(b *testing.B) {
 					return false
 				}
 				return true
-			}).Count()
+			}).Foreach(func(i int) {
+
+			})
 		}
 	})
 }

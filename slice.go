@@ -17,7 +17,7 @@ type SliceStream struct {
 	slice interface{}
 }
 
-func Slice(slice interface{}) *SliceStream {
+func SimpleSlice(slice interface{}) *SliceStream {
 	if !VerifySlice(slice) {
 		return nil
 	}
