@@ -283,6 +283,78 @@ func TestStreamMap(t *testing.T) {
 	})
 }
 
+func TestStreamMapStruct(t *testing.T) {
+	t.Run("struct2struct", func(t *testing.T) {
+		newFunc(student{
+			name:   "lilei",
+			gender: "boy",
+			age:    10,
+		}, student{
+			name:   "hanmeimei",
+			gender: "girl",
+			age:    9,
+		}, student{
+			name:   "lucy",
+			gender: "girl",
+			age:    10,
+		}, student{
+			name:   "jim",
+			gender: "boy",
+			age:    10,
+		}, student{
+			name:   "lily",
+			gender: "girl",
+			age:    10,
+		}).Map(func(s student) people {
+			return people{
+				name:       s.name,
+				gender:     s.gender,
+				profession: "student",
+			}
+		}).Foreach(func(i people) {
+			switch i.name {
+			case "lilei", "hanmeimei", "lucy", "lily", "jim":
+				t.Log(i)
+			default:
+				t.Fatal()
+			}
+		})
+	})
+
+	t.Run("struct2int", func(t *testing.T) {
+		newFunc(student{
+			name:   "lilei",
+			gender: "boy",
+			age:    10,
+		}, student{
+			name:   "hanmeimei",
+			gender: "girl",
+			age:    9,
+		}, student{
+			name:   "lucy",
+			gender: "girl",
+			age:    10,
+		}, student{
+			name:   "jim",
+			gender: "boy",
+			age:    10,
+		}, student{
+			name:   "lily",
+			gender: "girl",
+			age:    10,
+		}).Map(func(s student) int {
+			return s.age
+		}).Foreach(func(i int) {
+			switch i {
+			case 9, 10:
+				t.Log(i)
+			default:
+				t.Fatal()
+			}
+		})
+	})
+}
+
 func TestStreamFlatMap(t *testing.T) {
 	newFunc("hello world", "xfali stream").FlatMap(func(s string) []string {
 		return strings.Split(s, " ")
