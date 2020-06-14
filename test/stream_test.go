@@ -15,7 +15,7 @@ import (
 	"testing"
 )
 
-var newFunc = NewList
+var newFunc = NewSlice
 
 func NewSlice(o ...interface{}) stream.Stream {
 	return stream.New(collection.CreateSlice(o...))
