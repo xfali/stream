@@ -11,21 +11,18 @@ import (
 )
 
 type PipeStream struct {
-	slice interface{}
-	head  valve.FuncValve
-	v     valve.FuncValve
+	c    Collection
+	head valve.FuncValve
+	v    valve.FuncValve
 }
 
-func Pipeline(slice interface{}) *PipeStream {
-	if !VerifySlice(slice) {
-		return nil
-	}
+func Slice(slice interface{}) *PipeStream {
 	n := &valve.NoneValve{}
 	n.SetState(valve.NORMAL)
 	return &PipeStream{
-		slice: slice,
-		head:  n,
-		v:     n,
+		c:    NewSlice(slice),
+		head: n,
+		v:    n,
 	}
 }
 
@@ -179,18 +176,19 @@ func (s *PipeStream) Collect() interface{} {
 }
 
 func (s *PipeStream) each() interface{} {
-	in := reflect.ValueOf(s.slice)
-	inType := in.Type().Elem()
+	inType := s.c.ElemType()
 	err := s.head.Verify(inType)
 	if err != nil {
 		panic(err)
 	}
-	err = s.head.Begin(in.Len())
+	err = s.head.Begin(s.c.Size())
 	if err != nil {
 		panic(err)
 	}
-	for i := 0; i < in.Len(); i++ {
-		err = s.head.Accept(in.Index(i))
+	iter := s.c.Iterator()
+	for iter.HasNext() {
+		v := iter.Next()
+		err = s.head.Accept(v)
 		if err != nil {
 			panic(err)
 		}
