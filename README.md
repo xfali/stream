@@ -89,7 +89,7 @@ stream可以通过collect支持更多的操作，内置的操作有：
 
 用法举例:
 ```
-s := newFunc(1, 2, 3, 4, 5).Filter(func(i int) bool {
+s := stream.Slice([]{1, 2, 3, 4, 5}).Filter(func(i int) bool {
 		return i != 3
 	}).Collect(collector.ToList()).(*list.List)
 
