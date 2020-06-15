@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package funcutil
 
@@ -27,9 +27,9 @@ func sort(function, slice interface{}) (interface{}, error) {
 	}
 
 	ss := SortSlice{
-		V:       in,
-		Compare: fn,
-		SwapFunc:    reflect.Swapper(slice),
+		V:        in,
+		Compare:  fn,
+		SwapFunc: reflect.Swapper(slice),
 	}
 	sort2.Sort(&ss)
 	return ss.V.Interface(), nil

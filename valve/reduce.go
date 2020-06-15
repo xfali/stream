@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package valve
 
@@ -21,7 +21,7 @@ func (valve *ReduceValve) Reset() {
 }
 
 func (valve *ReduceValve) Verify(t reflect.Type) error {
-	if ! funcutil.VerifyReduceFuncType(valve.fn, t) {
+	if !funcutil.VerifyReduceFuncType(valve.fn, t) {
 		return errors.New("reduce: Function must be of type func(" + t.String() + ")" + t.String())
 	}
 	return nil

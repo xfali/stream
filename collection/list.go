@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package collection
 
@@ -20,7 +20,7 @@ func NewList(l *list2.List) *list {
 	}
 }
 
-func CreateList(v...interface{}) *list {
+func CreateList(v ...interface{}) *list {
 	if len(v) == 0 {
 		return nil
 	}

@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package valve
 
@@ -68,9 +68,9 @@ func (valve *FindLastValve) Result() reflect.Value {
 
 type FindAnyValve struct {
 	BaseValve
-	ret reflect.Value
-	cur int
-	dest int
+	ret    reflect.Value
+	cur    int
+	dest   int
 	values []reflect.Value
 }
 

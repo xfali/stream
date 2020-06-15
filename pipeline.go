@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package stream
 
@@ -54,7 +54,10 @@ func (s *PipelineStream) Limit(size int) Stream {
 
 func (s *PipelineStream) Filter(fn interface{}) Stream {
 	valve := &valve.FilterValve{}
-	valve.Init(fn)
+	err := valve.Init(fn)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 	return s
@@ -71,7 +74,10 @@ func (s *PipelineStream) Skip(size int) Stream {
 
 func (s *PipelineStream) Distinct(fn interface{}) Stream {
 	valve := &valve.DistinctValve{}
-	valve.Init(fn)
+	err := valve.Init(fn)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 	return s
@@ -79,7 +85,10 @@ func (s *PipelineStream) Distinct(fn interface{}) Stream {
 
 func (s *PipelineStream) Sort(fn interface{}) Stream {
 	valve := &valve.SortValve{}
-	valve.Init(fn)
+	err := valve.Init(fn)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 	return s
@@ -114,7 +123,10 @@ func (s *PipelineStream) FindAny() *Option {
 
 func (s *PipelineStream) Foreach(eachFn interface{}) {
 	valve := &valve.ForeachValve{}
-	valve.Init(eachFn)
+	err := valve.Init(eachFn)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 
@@ -123,7 +135,10 @@ func (s *PipelineStream) Foreach(eachFn interface{}) {
 
 func (s *PipelineStream) Peek(eachFn interface{}) Stream {
 	valve := &valve.PeekValve{}
-	valve.Init(eachFn)
+	err := valve.Init(eachFn)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 	return s
@@ -131,7 +146,10 @@ func (s *PipelineStream) Peek(eachFn interface{}) Stream {
 
 func (s *PipelineStream) AnyMatch(fn interface{}) bool {
 	valve := &valve.MatchAnyValve{}
-	valve.Init(fn)
+	err := valve.Init(fn)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 
@@ -140,7 +158,10 @@ func (s *PipelineStream) AnyMatch(fn interface{}) bool {
 
 func (s *PipelineStream) AllMatch(fn interface{}) bool {
 	valve := &valve.MatchAllValve{}
-	valve.Init(fn)
+	err := valve.Init(fn)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 
@@ -149,7 +170,10 @@ func (s *PipelineStream) AllMatch(fn interface{}) bool {
 
 func (s *PipelineStream) Map(fn interface{}) Stream {
 	valve := &valve.MapValve{}
-	valve.Init(fn)
+	err := valve.Init(fn)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 
@@ -158,7 +182,10 @@ func (s *PipelineStream) Map(fn interface{}) Stream {
 
 func (s *PipelineStream) FlatMap(fn interface{}) Stream {
 	valve := &valve.FlatMapValve{}
-	valve.Init(fn)
+	err := valve.Init(fn)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 
@@ -170,7 +197,10 @@ func (s *PipelineStream) Reduce(fn, initValue interface{}) interface{} {
 	if initValue != nil {
 		valve.V = reflect.ValueOf(initValue)
 	}
-	valve.Init(fn)
+	err := valve.Init(fn)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 

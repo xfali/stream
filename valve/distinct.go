@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package valve
 
@@ -26,7 +26,7 @@ func (valve *DistinctValve) Reset() {
 
 func (valve *DistinctValve) Verify(t reflect.Type) error {
 	valve.sliceType = reflect.SliceOf(t)
-	if ! funcutil.VerifyEqualFunction(valve.fn, t) {
+	if !funcutil.VerifyEqualFunction(valve.fn, t) {
 		return fmt.Errorf("distinct: Function must be of type func(%s, %s) bool", t.String(), t.String())
 	}
 	return valve.next.Verify(t)

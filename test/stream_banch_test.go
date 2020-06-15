@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package test
 
@@ -15,7 +15,7 @@ import (
 
 func makeSlice() []string {
 	var ret []string
-	for i:=0; i<256; i++ {
+	for i := 0; i < 256; i++ {
 		ret = append(ret, strconv.Itoa(rand.Intn(99999999)))
 	}
 	return ret
@@ -24,7 +24,7 @@ func makeSlice() []string {
 func BenchmarkPipelineSimpleCount(b *testing.B) {
 	benchSlice := makeSlice()
 	b.Run("pipeline", func(b *testing.B) {
-		for i:=0; i<b.N; i++ {
+		for i := 0; i < b.N; i++ {
 			stream.Slice(benchSlice).Count()
 		}
 	})
@@ -33,7 +33,7 @@ func BenchmarkPipelineSimpleCount(b *testing.B) {
 func BenchmarkPipelineCount(b *testing.B) {
 	benchSlice := makeSlice()
 	b.Run("pipeline", func(b *testing.B) {
-		for i:=0; i<b.N; i++ {
+		for i := 0; i < b.N; i++ {
 			stream.Slice(benchSlice).Filter(func(s string) bool {
 				return s != "5646"
 			}).FlatMap(func(s string) []string {
@@ -58,7 +58,7 @@ func BenchmarkPipelineCount(b *testing.B) {
 func BenchmarkPipelineForeach(b *testing.B) {
 	benchSlice := makeSlice()
 	b.Run("pipeline", func(b *testing.B) {
-		for i:=0; i<b.N; i++ {
+		for i := 0; i < b.N; i++ {
 			stream.Slice(benchSlice).Filter(func(s string) bool {
 				return s != "5646"
 			}).FlatMap(func(s string) []string {
@@ -81,4 +81,3 @@ func BenchmarkPipelineForeach(b *testing.B) {
 		}
 	})
 }
-

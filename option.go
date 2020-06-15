@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package stream
 
@@ -25,17 +25,11 @@ func CanNil(i interface{}) *Option {
 }
 
 func (o *Option) IsPresent() bool {
-	if o.val != nil {
-		return true
-	}
-	return false
+	return o.val != nil
 }
 
 func (o *Option) IsNil() bool {
-	if o.val == nil {
-		return true
-	}
-	return false
+	return o.val == nil
 }
 
 func (o *Option) IfPresent(fn func(interface{})) {
@@ -133,10 +127,7 @@ func (o *Option) verifyBindFuncType(fn reflect.Value) bool {
 		return false
 	}
 	val := reflect.ValueOf(o.val)
-	if fn.Type().In(0) != val.Type() {
-		return false
-	}
-	return true
+	return fn.Type().In(0) == val.Type()
 }
 
 func (o *Option) verifyFilterFuncType(fn reflect.Value) bool {

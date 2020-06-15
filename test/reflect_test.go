@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package test
 
@@ -33,4 +33,3 @@ func TestReflect2(t *testing.T) {
 		t.Log(sl.Index(i).Interface())
 	}
 }
-

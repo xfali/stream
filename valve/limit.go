@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package valve
 
@@ -23,7 +23,7 @@ func (valve *LimitValve) Reset() {
 }
 
 func (valve *LimitValve) Verify(t reflect.Type) error {
-	return  valve.next.Verify(t)
+	return valve.next.Verify(t)
 }
 
 func (valve *LimitValve) Begin(count int) error {

@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2020, Xiongfa Li.
 // @author xiongfa.li
 // @version V1.0
-// Description: 
+// Description:
 
 package valve
 
@@ -25,7 +25,7 @@ func (valve *SortValve) Reset() {
 
 func (valve *SortValve) Verify(t reflect.Type) error {
 	valve.sliceType = reflect.SliceOf(t)
-	if ! funcutil.VerifyCompareFunction(valve.fn, t) {
+	if !funcutil.VerifyCompareFunction(valve.fn, t) {
 		return errors.New("sort: Function must be of type func(" + t.String() + "," + t.String() + ") int")
 	}
 	return valve.next.Verify(t)
