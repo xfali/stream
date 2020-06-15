@@ -7,6 +7,7 @@ package collector
 
 import (
 	"container/list"
+	"errors"
 	"github.com/xfali/stream/funcutil"
 	"reflect"
 )
@@ -66,6 +67,8 @@ type mapCollector struct {
 	fn reflect.Value
 }
 
+// 转换收集为map
+// 参数类型为：fn func(ELEM_TYPE) (KEY_TYPE, VALUE_TYPE)
 func ToMap(fn interface{}) Collector {
 	return &mapCollector{
 		fn: reflect.ValueOf(fn),
@@ -76,7 +79,7 @@ func (c *mapCollector) New(elemType reflect.Type, size int) error {
 	ok := funcutil.VerifyGroupFuncType(c.fn, elemType)
 	keyType, ValueType := c.fn.Type().Out(0), c.fn.Type().Out(1)
 	if !ok || keyType == nil || ValueType == nil {
-		panic("ToMap: Function must be of type func(" + elemType.String() + ") (keyType, valueType)")
+		return errors.New("ToMap: Function must be of type func(" + elemType.String() + ") (keyType, valueType)")
 	}
 
 	mapType := reflect.MapOf(keyType, ValueType)
@@ -103,6 +106,8 @@ type groupCollector struct {
 	size int
 }
 
+// 转换收集为map
+// 参数类型为：fn func(ELEM_TYPE) (KEY_TYPE, VALUE_TYPE)
 func GroupBy(fn interface{}) Collector {
 	return &groupCollector{
 		fn: reflect.ValueOf(fn),
@@ -113,7 +118,7 @@ func (c *groupCollector) New(elemType reflect.Type, size int) error {
 	ok := funcutil.VerifyGroupFuncType(c.fn, elemType)
 	keyType, ValueType := c.fn.Type().Out(0), c.fn.Type().Out(1)
 	if !ok || keyType == nil || ValueType == nil {
-		panic("GroupBy: Function must be of type func(" + elemType.String() + ") (keyType, valueType)")
+		return errors.New("GroupBy: Function must be of type func(" + elemType.String() + ") (keyType, valueType)")
 	}
 
 	mapType := reflect.MapOf(keyType, reflect.SliceOf(elemType))

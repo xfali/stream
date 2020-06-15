@@ -39,8 +39,7 @@ func (valve *CollectValve) Begin(count int) error {
 	if count == -1 {
 		count = DefaultCapacity
 	}
-	valve.collector.New(valve.elemType, count)
-	return nil
+	return valve.collector.New(valve.elemType, count)
 }
 
 func (valve *CollectValve) End() error {

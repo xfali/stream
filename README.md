@@ -78,6 +78,33 @@ stream.List(testList).FlatMap(func(s string) []int {
 })
 ```
 
+## collector
+stream可以通过collect支持更多的操作，内置的操作有：
+|  collector   | 说明  |
+|  :----  | :----  |
+| collector.ToSlice  | 收集为slice |
+| collector.ToList  | 收集为*list.List |
+| collector.ToMap  | 收集为map[KEY]VALUE |
+| collector.GroupBy  | 分组收集为map[KEY][]VALUE |
+
+用法举例:
+```
+s := newFunc(1, 2, 3, 4, 5).Filter(func(i int) bool {
+		return i != 3
+	}).Collect(collector.ToList()).(*list.List)
+
+e := s.Front()
+for e != nil {
+    if e.Value.(int) == 3 {
+        t.Fatal("cannot be 3")
+    } else {
+        t.Log(e.Value)
+    }
+    e = e.Next()
+}
+```
+更多用法参考[test](test/stream_test.go)
+
 ## 未完成项
 * 并行处理
 
