@@ -9,13 +9,14 @@ import (
 	"container/list"
 	"github.com/xfali/stream"
 	"github.com/xfali/stream/collection"
+	"github.com/xfali/stream/collector"
 	"reflect"
 	"strconv"
 	"strings"
 	"testing"
 )
 
-var newFunc = NewSlice
+var newFunc = NewList
 
 func NewSlice(o ...interface{}) stream.Stream {
 	return stream.New(collection.CreateSlice(o...))
@@ -30,7 +31,7 @@ func TestSlice(t *testing.T) {
 		return stream.Slice(strings.Split(s, ",")).Map(func(s string) int {
 			i, _ := strconv.Atoi(s)
 			return i
-		}).Collect().([]int)
+		}).Collect(nil).([]int)
 	}).Filter(func(i int) bool {
 		return i != 5
 	}).Sort(func(a, b int) int {
@@ -52,7 +53,7 @@ func TestList(t *testing.T) {
 		return stream.Slice(strings.Split(s, ",")).Map(func(s string) int {
 			i, _ := strconv.Atoi(s)
 			return i
-		}).Collect().([]int)
+		}).Collect(collector.ToSlice()).([]int)
 	}).Filter(func(i int) bool {
 		return i != 5
 	}).Sort(func(a, b int) int {
@@ -371,7 +372,7 @@ func TestStreamFlatMap(t *testing.T) {
 		return stream.Slice(strings.Split(s, ",")).Map(func(s string) int {
 			i, _ := strconv.Atoi(s)
 			return i
-		}).Collect().([]int)
+		}).Collect(collector.ToSlice()).([]int)
 	}).Foreach(func(i int) {
 		switch i {
 		case 1, 2, 3, 4, 5, 6, 7, 8:
@@ -525,6 +526,86 @@ func TestStreamReduce(t *testing.T) {
 			t.Fatal("expect 15 but get: ", ret)
 		}
 	})
+}
+
+func TestStreamCollectSlice(t *testing.T) {
+	s := newFunc(1, 2, 3, 4, 5).Filter(func(i int) bool {
+		return i != 3
+	}).Collect(collector.ToSlice()).([]int)
+	for _, v := range s {
+		if v == 3 {
+			t.Fatal("expect without 3 but get it")
+		} else {
+			t.Log(v)
+		}
+	}
+}
+
+func TestStreamCollectList(t *testing.T) {
+	s := newFunc(1, 2, 3, 4, 5).Filter(func(i int) bool {
+		return i != 3
+	}).Collect(collector.ToList()).(*list.List)
+	e := s.Front()
+	for e != nil {
+		if e.Value.(int) == 3 {
+			t.Fatal("expect without 3 but get it")
+		} else {
+			t.Log(e.Value)
+		}
+		e = e.Next()
+	}
+}
+
+func TestStreamCollectMap(t *testing.T) {
+	s := newFunc(1, 2, 3, 4, 5).Filter(func(i int) bool {
+		return i != 3
+	}).Collect(collector.ToMap(func(i int) (string, int) {
+		return strconv.Itoa(i), i
+	})).(map[string]int)
+	for k, v := range s {
+		if k == "3" || v == 3 {
+			t.Fatal("expect without 3 but get it")
+		} else {
+			t.Log(k, v)
+		}
+	}
+}
+
+func TestStreamCollectGroup(t *testing.T) {
+	s := newFunc(student{
+		name:   "lilei",
+		gender: "boy",
+		age:    10,
+	}, student{
+		name:   "hanmeimei",
+		gender: "girl",
+		age:    9,
+	}, student{
+		name:   "lucy",
+		gender: "girl",
+		age:    10,
+	}, student{
+		name:   "jim",
+		gender: "boy",
+		age:    10,
+	}, student{
+		name:   "lily",
+		gender: "girl",
+		age:    10,
+	}).Filter(func(s student) bool {
+		return s.age != 9
+	}).Collect(collector.GroupBy(func(s student) (string, student) {
+		return s.gender, s
+	})).(map[string][]student)
+	for k, v := range s {
+		for _, stu := range v {
+			if stu.name == "hanmeimei" {
+				t.Fatal("expect without hanmeimei, but get she")
+			} else {
+				t.Log(k, stu)
+			}
+		}
+	}
 }
 
 func TestStreamCountComplex(t *testing.T) {

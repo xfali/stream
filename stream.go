@@ -66,5 +66,6 @@ type Stream interface {
 	Reduce(fn, initValue interface{}) interface{}
 
 	// 获得slice
-	Collect() interface{}
+	// 参数类型为：collector.Collector
+	Collect(collector interface{}) interface{}
 }

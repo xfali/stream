@@ -6,20 +6,40 @@
 package valve
 
 import (
+	"errors"
+	"github.com/xfali/stream/collector"
 	"reflect"
 )
 
 type CollectValve struct {
 	BaseValve
-	slice reflect.Value
+	collector collector.Collector
+	elemType  reflect.Type
 }
 
 func (valve *CollectValve) Verify(t reflect.Type) error {
-	valve.slice = reflect.MakeSlice(reflect.SliceOf(t), 0, DefaultCapacity)
+	valve.elemType = t
+	return nil
+}
+
+func (valve *CollectValve) Init(fn interface{}) error {
+	if fn != nil {
+		c, ok := fn.(collector.Collector)
+		if !ok {
+			return errors.New("param is not collector.Collector")
+		}
+		valve.collector = c
+	} else {
+		valve.collector = collector.ToSlice()
+	}
 	return nil
 }
 
 func (valve *CollectValve) Begin(count int) error {
+	if count == -1 {
+		count = DefaultCapacity
+	}
+	valve.collector.New(valve.elemType, count)
 	return nil
 }
 
@@ -28,10 +48,9 @@ func (valve *CollectValve) End() error {
 }
 
 func (valve *CollectValve) Accept(v reflect.Value) error {
-	valve.slice = reflect.Append(valve.slice, v)
-	return nil
+	return valve.collector.Add(v)
 }
 
 func (valve *CollectValve) Result() reflect.Value {
-	return valve.slice
+	return valve.collector.Result()
 }

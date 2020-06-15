@@ -21,7 +21,8 @@ func group(function, slice interface{}) (interface{}, error) {
 	}
 	fn := reflect.ValueOf(function)
 	inType := in.Type().Elem()
-	ok, keyType, ValueType := verifyGroupFuncType(fn, inType)
+	ok := VerifyGroupFuncType(fn, inType)
+	keyType, ValueType := fn.Type().Out(0), fn.Type().Out(1)
 	if !ok || keyType == nil || ValueType == nil {
 		panic("group: Function must be of type func(" + inType.String() + ") (keyType, valueType)")
 	}
@@ -44,15 +45,15 @@ func group(function, slice interface{}) (interface{}, error) {
 	return out.Interface(), nil
 }
 
-func verifyGroupFuncType(fn reflect.Value, elemType reflect.Type) (bool, reflect.Type, reflect.Type) {
+func VerifyGroupFuncType(fn reflect.Value, elemType reflect.Type) bool {
 	if fn.Kind() != reflect.Func {
-		return false, nil, nil
+		return false
 	}
 	if fn.Type().NumIn() != 1 || fn.Type().NumOut() != 2 {
-		return false, nil, nil
+		return false
 	}
 	if fn.Type().In(0) != elemType {
-		return false, nil, nil
+		return false
 	}
-	return true, fn.Type().Out(0), fn.Type().Out(1)
+	return true
 }

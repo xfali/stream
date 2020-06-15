@@ -207,8 +207,12 @@ func (s *PipelineStream) Reduce(fn, initValue interface{}) interface{} {
 	return s.each()
 }
 
-func (s *PipelineStream) Collect() interface{} {
+func (s *PipelineStream) Collect(collector interface{}) interface{} {
 	valve := &valve.CollectValve{}
+	err := valve.Init(collector)
+	if err != nil {
+		panic(err)
+	}
 	s.v.Next(valve)
 	s.v = valve
 
