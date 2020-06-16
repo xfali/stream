@@ -23,6 +23,8 @@ func (valve *MapValve) Verify(t reflect.Type) error {
 }
 
 func (valve *MapValve) Begin(count int) error {
+	valve.state = UnsetState(valve.state, SORTED)
+	valve.state = UnsetState(valve.state, DISTINCT)
 	valve.next.SetState(valve.state)
 	return valve.next.Begin(count)
 }

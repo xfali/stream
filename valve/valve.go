@@ -49,6 +49,10 @@ func SetState(state, flag int) int {
 	return state | flag
 }
 
+func UnsetState(state, flag int) int {
+	return state & (^flag)
+}
+
 func (valve *BaseValve) Init(fn interface{}) error {
 	v := reflect.ValueOf(fn)
 	if v.Kind() != reflect.Func {
