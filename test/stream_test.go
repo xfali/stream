@@ -188,31 +188,72 @@ func TestStreamLimitSkip(t *testing.T) {
 
 func TestStreamDistinct(t *testing.T) {
 	t.Run("distinct", func(t *testing.T) {
-		newFunc(1, 2, 2, 4, 5).Distinct(func(a, b int) bool {
+		ret := newFunc(1, 2, 2, 4, 5).Distinct(func(a, b int) bool {
 			return a == b
-		}).Foreach(func(i int) {
+		}).Peek(func(i int) {
 			t.Log(i)
-		})
+		}).Collect(collector.ToSlice()).([]int)
+		if ret[0] != 1 || ret[1] != 2 || ret[2] != 4 || ret[3] != 5 {
+			t.Fatal("error")
+		}
 	})
 
 	t.Run("distinct twice", func(t *testing.T) {
-		newFunc(1, 2, 2, 4, 5).Distinct(func(a, b int) bool {
+		ret := newFunc(1, 2, 2, 4, 5).Distinct(func(a, b int) bool {
 			return a == b
 		}).Distinct(func(a, b int) bool {
 			return a == b
-		}).Foreach(func(i int) {
+		}).Peek(func(i int) {
 			t.Log(i)
-		})
+		}).Collect(collector.ToSlice()).([]int)
+		if ret[0] != 1 || ret[1] != 2 || ret[2] != 4 || ret[3] != 5 {
+			t.Fatal("error")
+		}
 	})
 
 	t.Run("distinct after sort", func(t *testing.T) {
-		newFunc(1, 2, 2, 4, 5).Sort(func(a, b int) int {
+		ret := newFunc(1, 2, 2, 4, 5).Sort(func(a, b int) int {
 			return a - b
 		}).Distinct(func(a, b int) bool {
 			return a == b
-		}).Foreach(func(i int) {
+		}).Peek(func(i int) {
 			t.Log(i)
-		})
+		}).Collect(collector.ToSlice()).([]int)
+		if ret[0] != 1 || ret[1] != 2 || ret[2] != 4 || ret[3] != 5 {
+			t.Fatal("error")
+		}
+	})
+
+	t.Run("distinct map distinct", func(t *testing.T) {
+		ret := newFunc(1, 2, 2, 4, 5).Distinct(func(a, b int) bool {
+			return a == b
+		}).Map(func(i int) string {
+			return strconv.Itoa(i)
+		}).Distinct(func(a, b string) bool {
+			return a == b
+		}).Peek(func(i string) {
+			t.Log(i)
+		}).Collect(collector.ToSlice()).([]string)
+		if ret[0] != "1" || ret[1] != "2" || ret[2] != "4" || ret[3] != "5" {
+			t.Fatal("error")
+		}
+	})
+
+	t.Run("distinct flatmap distinct", func(t *testing.T) {
+		ret := newFunc("5,2,3,2,4", "7,7,8,9", "7,7,8,9").Distinct(func(a, b string) bool {
+			return a == b
+		}).Peek(func(i string) {
+			t.Log(i)
+		}).FlatMap(func(i string) []string {
+			return strings.Split(i, ",")
+		}).Distinct(func(a, b string) bool {
+			return a == b
+		}).Peek(func(i string) {
+			t.Log(i)
+		}).Collect(collector.ToSlice()).([]string)
+		if ret[0] != "5" || ret[1] != "2" || ret[2] != "3" || ret[3] != "4" {
+			t.Fatal("error")
+		}
 	})
 }
 
@@ -267,6 +308,40 @@ func TestStreamSort(t *testing.T) {
 		}).Foreach(func(i int) {
 			t.Log(i)
 		})
+	})
+
+	t.Run("desc sort and map and asc sort", func(t *testing.T) {
+		s := newFunc(5, 2, 3, 1, 4)
+		ret := s.Sort(func(a, b int) int {
+			return b - a
+		}).Peek(func(i int) {
+			t.Log(i)
+		}).Map(func(i int) string {
+			return strconv.Itoa(i)
+		}).Sort(strings.Compare).Collect(collector.ToSlice()).([]string)
+		for i := range ret {
+			if ret[i] != strconv.Itoa(i+1) {
+				t.Fatal("not match")
+			} else {
+				t.Log(ret[i])
+			}
+		}
+	})
+
+	t.Run("desc sort and flatmap and asc sort", func(t *testing.T) {
+		s := newFunc("5,2,3,1,4", "7,6,8,9")
+		ret := s.Sort(strings.Compare).Peek(func(i string) {
+			t.Log(i)
+		}).FlatMap(func(i string) []string {
+			return strings.Split(i, ",")
+		}).Sort(strings.Compare).Collect(collector.ToSlice()).([]string)
+		for i := range ret {
+			if ret[i] != strconv.Itoa(i+1) {
+				t.Fatal("not match")
+			} else {
+				t.Log(ret[i])
+			}
+		}
 	})
 }
 
@@ -391,11 +466,27 @@ func TestStreamCount(t *testing.T) {
 		}
 	})
 
+	t.Run("skip", func(t *testing.T) {
+		c := newFunc(1, 2, 3, 4, 5).Skip(2).Count()
+		if c != 3 {
+			t.Fatal("expect 2 but get: ", c)
+		}
+	})
+
 	t.Run("filter", func(t *testing.T) {
 		c := newFunc(1, 2, 3, 4, 5).Filter(func(a int) bool {
 			return a != 2
 		}).Count()
 		if c != 4 {
+			t.Fatal("expect 2 but get: ", c)
+		}
+	})
+
+	t.Run("flatmap", func(t *testing.T) {
+		c := newFunc("0,1,2,3,4", "5,6,7,8,9").FlatMap(func(a string) []string {
+			return strings.Split(a, ",")
+		}).Count()
+		if c != 10 {
 			t.Fatal("expect 2 but get: ", c)
 		}
 	})
