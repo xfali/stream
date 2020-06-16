@@ -1,6 +1,7 @@
 # stream
 
 [![Build status](https://ci.appveyor.com/api/projects/status/naq9w2g2ohvd4bup?svg=true)](https://ci.appveyor.com/project/xfali/stream)
+[![Go Report Card](https://goreportcard.com/badge/github.com/xfali/stream)](https://goreportcard.com/report/github.com/xfali/stream)
 
 stream是一个支持多种聚合操作的数据序列，支持转化处理的数据有：
 |  类型   | 说明  |
