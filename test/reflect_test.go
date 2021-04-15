@@ -33,3 +33,11 @@ func TestReflect2(t *testing.T) {
 		t.Log(sl.Index(i).Interface())
 	}
 }
+
+func TestReflectValid(t *testing.T) {
+	v := reflect.Value{}
+	t.Log(v.IsValid())
+	if v.IsValid() {
+		t.Fatal("cannot be valid")
+	}
+}

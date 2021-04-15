@@ -68,7 +68,7 @@ func (o *Option) And(other *Option) *Option {
 	return other
 }
 
-// And returns None if this option is None, otherwise returns the option received.
+// Else returns current option if this option is not None, otherwise returns the option received.
 func (o *Option) Else(other *Option) *Option {
 	if o.IsPresent() {
 		return o

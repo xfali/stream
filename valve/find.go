@@ -79,11 +79,6 @@ func (valve *FindAnyValve) Verify(t reflect.Type) error {
 }
 
 func (valve *FindAnyValve) Begin(count int) error {
-	if count != -1 {
-		valve.dest = rand.Intn(count)
-	} else {
-		valve.dest = -1
-	}
 	return nil
 }
 
@@ -92,20 +87,13 @@ func (valve *FindAnyValve) End() error {
 }
 
 func (valve *FindAnyValve) Accept(v reflect.Value) error {
-	if valve.dest != -1 {
-		if valve.cur == valve.dest {
-			valve.ret = v
-		}
-		valve.cur++
-	} else {
-		valve.values = append(valve.values, v)
-	}
+	valve.values = append(valve.values, v)
 	return nil
 }
 
 func (valve *FindAnyValve) Result() reflect.Value {
-	if valve.dest != -1 {
-		return valve.ret
+	if len(valve.values) == 0 {
+		return reflect.Value{}
 	} else {
 		return valve.values[rand.Intn(len(valve.values))]
 	}

@@ -16,7 +16,7 @@ import (
 	"testing"
 )
 
-var newFunc = NewList
+var newFunc = NewSlice
 
 func NewSlice(o ...interface{}) stream.Stream {
 	return stream.New(collection.CreateSlice(o...))
@@ -100,20 +100,36 @@ func TestStreamLast(t *testing.T) {
 }
 
 func TestStreamFindAny(t *testing.T) {
-	for i := 0; i < 10; i++ {
-		s := newFunc(1, 2, 3, 4, 5)
-		t.Log(s.FindAny().Get())
-	}
-	for i := 0; i < 10; i++ {
-		s := newFunc(1, 2, 3, 4, 5)
-		v := s.Filter(func(i int) bool {
-			return i != 2
-		}).FindAny().Get()
-		t.Log(v)
-		if v == 2 {
-			t.Fatal("cannot be 2")
+	t.Run("normal", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			s := newFunc(1, 2, 3, 4, 5)
+			t.Log(s.FindAny().Get())
 		}
-	}
+	})
+
+	t.Run("filter", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			s := newFunc(1, 2, 3, 4, 5)
+			v := s.Filter(func(i int) bool {
+				return i != 2
+			}).FindAny().Get()
+			t.Log(v)
+			if v == 2 {
+				t.Fatal("cannot be 2")
+			}
+		}
+	})
+
+	t.Run("find none", func(t *testing.T) {
+		s := newFunc(1, 2, 3, 4, 5)
+		op := s.Filter(func(i int) bool {
+			return i == 10
+		}).FindAny()
+		if op.IsPresent() {
+			t.Fatal("must be nil")
+		}
+		t.Log(op.IsNil())
+	})
 }
 
 func TestStreamLimit(t *testing.T) {
