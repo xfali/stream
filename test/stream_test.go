@@ -679,7 +679,7 @@ func TestStreamCollectMap(t *testing.T) {
 }
 
 func TestStreamCollectGroup(t *testing.T) {
-	s := newFunc(student{
+	st := newFunc(student{
 		name:   "lilei",
 		gender: "boy",
 		age:    10,
@@ -699,20 +699,42 @@ func TestStreamCollectGroup(t *testing.T) {
 		name:   "lily",
 		gender: "girl",
 		age:    10,
-	}).Filter(func(s student) bool {
-		return s.age != 9
-	}).Collect(collector.GroupBy(func(s student) (string, student) {
-		return s.gender, s
-	})).(map[string][]student)
-	for k, v := range s {
-		for _, stu := range v {
-			if stu.name == "hanmeimei" {
-				t.Fatal("expect without hanmeimei, but get she")
-			} else {
-				t.Log(k, stu)
+	})
+	t.Run("same type", func(t *testing.T) {
+		s := st.Filter(func(s student) bool {
+			return s.age != 9
+		}).Collect(collector.GroupBy(func(s student) (string, student) {
+			return s.gender, s
+		})).(map[string][]student)
+		for k, v := range s {
+			t.Log("==============group=============", k)
+			for _, stu := range v {
+				if stu.name == "hanmeimei" {
+					t.Fatal("expect without hanmeimei, but get she")
+				} else {
+					t.Log(k, stu)
+				}
 			}
 		}
-	}
+	})
+
+	t.Run("diff type", func(t *testing.T) {
+		s := st.Filter(func(s student) bool {
+			return s.age != 9
+		}).Collect(collector.GroupBy(func(s student) (string, string) {
+			return s.gender, s.name
+		})).(map[string][]string)
+		for k, v := range s {
+			t.Log("==============group=============", k)
+			for _, name := range v {
+				if name == "hanmeimei" {
+					t.Fatal("expect without hanmeimei, but get she")
+				} else {
+					t.Log(k, name)
+				}
+			}
+		}
+	})
 }
 
 func TestStreamCountComplex(t *testing.T) {

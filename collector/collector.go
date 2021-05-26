@@ -121,7 +121,7 @@ func (c *groupCollector) New(elemType reflect.Type, size int) error {
 		return errors.New("GroupBy: Function must be of type func(" + elemType.String() + ") (keyType, valueType)")
 	}
 
-	mapType := reflect.MapOf(keyType, reflect.SliceOf(elemType))
+	mapType := reflect.MapOf(keyType, reflect.SliceOf(ValueType))
 	c.m = reflect.MakeMap(mapType)
 	if size == -1 {
 		size = 64
@@ -137,7 +137,7 @@ func (c *groupCollector) Add(elemValue reflect.Value) error {
 
 	v := c.m.MapIndex(ret[0])
 	if !v.IsValid() {
-		sliceType := reflect.SliceOf(elemValue.Type())
+		sliceType := c.m.Type().Elem()
 		v = reflect.MakeSlice(sliceType, 0, c.size/2)
 	}
 	v = reflect.Append(v, ret[1])
